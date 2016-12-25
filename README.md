@@ -60,13 +60,13 @@ ShadowsocksR-libev for OpenWrt
 --- 
 本软件包依赖库：libopenssl、libpthread、ipset、ip、iptables-mod-tproxy、libpcre，opkg会自动安装
 
-软件编译后可生成三个软件包，分别是luci-app-shadowsocksR（含客户端和服务器）、luci-app-shadowsocksR-client（只含客户端）、luci-app-shadowsocksR-Server（只含服务端），用户根据需要或路由器空间大小选择其中一个安装即可
+软件编译后可生成三个软件包，分别是luci-app-shadowsocksR（含客户端和服务端）、luci-app-shadowsocksR-client（只含客户端）、luci-app-shadowsocksR-Server（只含服务端），用户根据需要或路由器空间大小选择其中一个安装即可
 
-先将编译成功的luci-app-shadowsocksR_*_all.ipk通过winscp上传到路由器的/tmp目录，执行命令：
+先将编译成功的luci-app-shadowsocksR*_all.ipk通过winscp上传到路由器的/tmp目录，执行命令：
 
    ```
    #opkg update
-   #opkg install /tmp/luci-app-shadowsocksR_*_all.ipk 
+   #opkg install /tmp/luci-app-shadowsocksR*_all.ipk 
    ```
 
 配置
@@ -111,6 +111,10 @@ ShadowsocksR-libev for OpenWrt
          
    ```
    注：此数据库一般无需刷新，如果刷新必须等待上面的命令运行完成，否则可能损坏数据库
+
+问题和建议反馈
+---
+请点击本页面上的“Issues”反馈使用问题或建议
 
 截图  
 ---
