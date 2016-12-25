@@ -22,7 +22,7 @@ ShadowsocksR-libev for OpenWrt
 
 可以和[Shadowsocks][5]共存，在openwrt可以通过luci界面切换使用[Shadowsocks][6]或ShadowsocksR
 
-兼容SS和SSR服务端，使用SS服务端时，传输协议需设置为origin，混淆插件需设置为plain
+客户端兼容运行SS或SSR的服务器，使用SS服务器时，传输协议需设置为origin，混淆插件需设置为plain
 
 
 编译
@@ -40,9 +40,9 @@ ShadowsocksR-libev for OpenWrt
    # 获取 Makefile
    git clone https://github.com/ywb94/openwrt-ssr.git package/openwrt-ssr
    # 选择要编译的包 
-   #luci ->3. Applications-> luci-app-shadowsocksR         包含客户端和服务器
+   #luci ->3. Applications-> luci-app-shadowsocksR         包含客户端和服务端
    #luci ->3. Applications-> luci-app-shadowsocksR-Client  只包含客户端
-   #luci ->3. Applications-> luci-app-shadowsocksR-Server  只包含客户端和服务器
+   #luci ->3. Applications-> luci-app-shadowsocksR-Server  只包含服务端
    make menuconfig
    
    #如果没有安装po2lmo，则安装（可选）
@@ -60,6 +60,8 @@ ShadowsocksR-libev for OpenWrt
 --- 
 本软件包依赖库：libopenssl、libpthread、ipset、ip、iptables-mod-tproxy、libpcre，opkg会自动安装
 
+软件编译后可生成三个软件包，分别是luci-app-shadowsocksR（含客户端和服务器）、luci-app-shadowsocksR-client（只含客户端）、luci-app-shadowsocksR-Server（只含服务端），用户根据需要或路由器空间大小选择其中一个安装即可
+
 先将编译成功的luci-app-shadowsocksR_*_all.ipk通过winscp上传到路由器的/tmp目录，执行命令：
 
    ```
@@ -70,29 +72,45 @@ ShadowsocksR-libev for OpenWrt
 配置
 ---
 
-   软件包可以通过luci配置，也可以通过配置文件, 配置文件内容为 JSON 格式, 支持的键:  
+   软件包通过luci配置， 支持的键如下:  
+   
+   客户端：
 
    键名           | 数据类型   | 说明
    ---------------|------------|-----------------------------------------------
-   server         | 字符串     | 服务器地址, 可以是 IP 或者域名
-   server_port    | 数值       | 服务器端口号, 小于 65535
+   auth_enable    | 布尔型     | 一次验证开关[0.关闭 1.开启],需要服务端同时支持
+   server         | 主机类型     | 服务器地址, 可以是 IP 或者域名，推荐使用IP地址
+   server_port    | 数值       | 服务器端口号, 小于 65535   
    local_port     | 数值       | 本地绑定的端口号, 小于 65535
+   timeout        | 数值       | 超时时间（秒）, 默认 60   
    password       | 字符串     | 服务端设置的密码
-   method         | 字符串     | 加密方式, [详情参考][2]
-   timeout        | 数值       | 超时时间（秒）, 默认 60
+   encrypt_method | 字符串     | 加密方式, [详情参考][2]
    protocol       | 字符串     | 传输协议，默认"origin"[详情参考][3]
    obfs           | 字符串     | 混淆插件，默认"plain" [详情参考][3]
    obfs_param     | 字符串     | 混淆插件参数 [详情参考][3]
    
+   服务端：
 
+   键名           | 数据类型   | 说明
+   ---------------|------------|-----------------------------------------------
+   server         | 字符串     | 服务器本机IP地址, 一般为0.0.0.0
+   server_port    | 数值       | 服务器监听端口号, 小于 65535
+   timeout        | 数值       | 超时时间（秒）, 默认 60
+   password       | 字符串     | 服务端设置的密码
+   encrypt_method | 字符串     | 加密方式, [详情参考][2]
+   protocol       | 字符串     | 传输协议，默认"origin"[详情参考][3]
+   obfs           | 字符串     | 混淆插件，默认"plain" [详情参考][3]
+   obfs_param     | 字符串     | 混淆插件参数 [详情参考][3]
    
    安装启用后自动分流国内、外流量，如需更新国内IP数据库在openwrt上执行"get_chinaip"命令即可：
    ```
-    # get_chinaip                                                                                                         
-    Connecting to ftp.apnic.net (202.12.29.205:80)                                                                                      
-    -                     82% |********************************************************************               |  1964k  0:00:10 ETA 
+    # get_chinaip  
+                                                                                                           
+      Connecting to ftp.apnic.net (202.12.29.205:80)                                                                                      
+
          
    ```
+   注：此数据库一般无需刷新，如果刷新必须等待上面的命令运行完成，否则可能损坏数据库
 
 截图  
 ---
