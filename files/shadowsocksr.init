@@ -54,21 +54,7 @@ gen_config_file() {
 EOF
 }
 
-gen_server_config_file() {
-         
-	cat <<-EOF >$CONFIG_SERVER_FILE
-		{
-		    "server": "$(uci_get_by_type server_config server)",
-		    "server_port": $(uci_get_by_type server_config server_port),
-		    "password": "$(uci_get_by_type server_config password)",
-		    "timeout": $(uci_get_by_type server_config timeout 60),
-		    "method": "$(uci_get_by_type server_config encrypt_method)",
-		    "protocol": "$(uci_get_by_type server_config protocol)",
-		    "obfs": "$(uci_get_by_type server_config obfs)",
-		    "obfs_param": "$(uci_get_by_type server_config obfs_param)"
-		}
-EOF
-}
+
 
 start_rules() {
 	local server=$(uci_get_by_name $GLOBAL_SERVER server)
@@ -134,14 +120,37 @@ start_redir() {
 	return $?
 }
 
+gen_service_file() {
+         
+	cat <<-EOF >$2
+		{
+		    "server": "$(uci_get_by_name $1 server)",
+		    "server_port": $(uci_get_by_name $1 server_port),
+		    "password": "$(uci_get_by_name $1 password)",
+		    "timeout": $(uci_get_by_name $1 timeout 60),
+		    "method": "$(uci_get_by_name $1 encrypt_method)",
+		    "protocol": "$(uci_get_by_name $1 protocol)",
+		    "obfs": "$(uci_get_by_name $1 obfs)",
+		    "obfs_param": "$(uci_get_by_name $1 obfs_param)"
+		}
+EOF
+}
+
+namecout=1
+start_service() {
+gen_service_file $1 /var/etc/${NAME}_${namecout}.json
+/usr/bin/ssr-server -c /var/etc/${NAME}_${namecout}.json -u -f /var/run/ssr-server${namecout}.pid 
+let namecout=namecout+1
+return 0
+}
+
 start_server() {
   SERVER_ENABLE=$(uci_get_by_type server_global enable_server)
   [ "$SERVER_ENABLE" = 0 ] && return 0
 	mkdir -p /var/run /var/etc
-	gen_server_config_file 
-	service_start /usr/bin/ssr-server -c $CONFIG_SERVER_FILE -u -f /var/run/ssr-server.pid 
-
-
+	config_load $NAME
+	config_foreach start_service server_config
+	
 	return 0
 }
 

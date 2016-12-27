@@ -67,6 +67,7 @@ o.rmempty = false
 -- [[ Server Setting ]]--
 s = m:section(TypedSection, "server_config", translate("Server Setting"))
 s.anonymous = true
+s.addremove   = true
 
 o = s:option(Value, "server", translate("Server Address"))
 o.datatype = "ipaddr"
