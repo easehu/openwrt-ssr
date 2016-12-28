@@ -24,6 +24,8 @@ ShadowsocksR-libev for OpenWrt
 
 客户端兼容运行SS或SSR的服务器，使用SS服务器时，传输协议需设置为origin，混淆插件需设置为plain
 
+服务端支持多端口、支持服务端进程守护（崩溃后自动重启）
+
 
 编译
 ---
