@@ -14,6 +14,7 @@ NAME=shadowsocksr
 EXTRA_COMMANDS=rules
 CONFIG_FILE=/var/etc/$NAME.json
 CONFIG_SERVER_FILE=/var/etc/${NAME}_s.json
+server_count=0
 
 uci_get_by_name() {
 	local ret=$(uci get $NAME.$1.$2 2>/dev/null)
@@ -136,11 +137,12 @@ gen_service_file() {
 EOF
 }
 
-namecout=1
+
 start_service() {
-gen_service_file $1 /var/etc/${NAME}_${namecout}.json
-/usr/bin/ssr-server -c /var/etc/${NAME}_${namecout}.json -u -f /var/run/ssr-server${namecout}.pid 
-let namecout=namecout+1
+let server_count=server_count+1
+gen_service_file $1 /var/etc/${NAME}_${server_count}.json
+/usr/bin/ssr-server -c /var/etc/${NAME}_${server_count}.json -u -f /var/run/ssr-server${server_count}.pid 
+
 return 0
 }
 
@@ -181,11 +183,18 @@ start() {
 	esac
 	fi
 	start_server	
+	if [ $server_count -gt 0 ]
+	then
+	(/usr/bin/ssr-monitor $server_count &)
+	fi
+	
 }
 
 stop() {
 	/usr/bin/ssr-rules -f
+	killall -q -9 ssr-monitor
 	killall -q -9 ssr-redir
 	killall -q -9 ssr-tunnel
 	killall -q -9 ssr-server
+
 }

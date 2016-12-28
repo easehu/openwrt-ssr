@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+# Copyright (C) 2016 openwrt-ssr
+# Copyright (C) 2016 yushi studio <ywb94@qq.com>
+#
+# This is free software, licensed under the GNU General Public License v3.
+# See /LICENSE for more information.
+#
+
+process_count=$1
+i=0
+while [ "1" = "1" ]  #死循环
+do 
+      icount=`ps  | grep ssr-server |grep -v grep| wc -l`
+      if [ $icount -lt $process_count ]  #如果进程挂掉就重启它
+      then
+      killall -q -9 ssr-server
+      for i in `seq $process_count`
+      do
+       /usr/bin/ssr-server -c /var/etc/shadowsocksr_$i.json -u -f /var/run/ssr-server$i.pid   
+      done  
+         
+      fi
+   sleep 30
+done
