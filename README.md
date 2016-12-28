@@ -7,14 +7,14 @@ ShadowsocksR-libev for OpenWrt
 
  本项目是 [shadowsocksr-libev][1] 在 OpenWrt 上的移植  
  
- [ar71xx平台预编译IPK下载][4]
+ 各平台预编译IPK请在release页面下载
 
 特性
 ---
 
 软件包包含 [shadowsocksr-libev][1] 的可执行文件,以及luci控制界面  
 
-支持SSR客户端、服务端模式（目前只支持部分混淆模式）
+支持SSR客户端、服务端模式（目前只支持部分混淆模式），服务端支持多端口和进程守护（崩溃后自动重启）
 
 支持自动分流，国内IP不走代理，国外IP段走透明代理，不需要再安装chnroute、gfwlist等软件
 
@@ -24,13 +24,11 @@ ShadowsocksR-libev for OpenWrt
 
 客户端兼容运行SS或SSR的服务器，使用SS服务器时，传输协议需设置为origin，混淆插件需设置为plain
 
-服务端支持多端口、支持服务端进程守护（崩溃后自动重启）
-
 
 编译
 ---
 
- - 从 OpenWrt 的 [SDK][S] 编译
+ - 从 OpenWrt 的 [SDK][S] 编译（编译环境：Ubuntu 64位系统），先下载对应平台的SDK
 
    ```bash
    # 以 ar71xx 平台为例
