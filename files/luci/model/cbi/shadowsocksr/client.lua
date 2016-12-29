@@ -1,10 +1,21 @@
 -- Copyright (C) 2016 yushi studio <ywb94@qq.com> github.com/ywb94
 -- Licensed to the public under the GNU General Public License v3.
 
-local m, s, o
+local m, s, o,kcp_enable
 local shadowsocksr = "shadowsocksr"
 local uci = luci.model.uci.cursor()
 local ipkg = require("luci.model.ipkg")
+local fs = require "nixio.fs"
+local sys = require "luci.sys"
+
+local function isKcptun(file)
+    if not fs.access(file, "rwx", "rx", "rx") then
+        fs.chmod(file, 755)
+    end
+
+    local str = sys.exec(file .. " -v | awk '{printf $1}'")
+    return (str:lower() == "kcptun")
+end
 
 if luci.sys.call("pidof ssr-redir >/dev/null") == 0 then
 	m = Map(shadowsocksr, translate("ShadowSocksR Client"), translate("ShadowSocksR is running"))
@@ -130,6 +141,36 @@ for _, v in ipairs(obfs) do o:value(v) end
 o.rmempty = false
 
 o = s:option(Value, "obfs_param", translate("obfs_param(optional)"))
+
+kcp_enable = s:option(Flag, "kcp_enable", translate("KcpTun Enable"), translate("bin:/usr/bin/kcptun/ssr-kcptun"))
+kcp_enable.rmempty = false
+
+
+o = s:option(Value, "kcp_port", translate("KcpTun Port"))
+o.datatype = "port"
+o.default = 4000
+function o.validate(self, value, section)
+		local kcp_file="/usr/bin/kcptun/ssr-kcptun"
+		local enable = kcp_enable:formvalue(section) or kcp_enable.disabled
+		if enable == kcp_enable.enabled then
+    if not fs.access(kcp_file)  then
+        return nil, translate("Haven't a Kcptun executable file")
+    elseif  not isKcptun(kcp_file) then
+        return nil, translate("Not a Kcptun executable file")    
+    end
+    end
+
+    return value
+end
+
+o = s:option(Value, "kcp_password", translate("KcpTun Password"))
+o:depends("kcp_enable","1")
+o.password = true
+
+o = s:option(Value, "kcp_param", translate("KcpTun Param"))
+o:depends("kcp_enable","1")
+o.default = ""
+
 
 -- [[ UDP Forward ]]--
 s = m:section(TypedSection, "udp_forward", translate("UDP Forward"))

@@ -35,7 +35,7 @@ msgid "Servers Setting"
 msgstr "服务器配置"
 
 msgid "Alias(optional)"
-msgstr "别名(可选)"
+msgstr "别名（可选）"
 
 msgid "Onetime Authentication"
 msgstr "一次验证"
@@ -129,3 +129,24 @@ msgstr "启动服务端"
 
 msgid "Server Setting"
 msgstr "服务端配置"
+
+msgid "KcpTun Enable"
+msgstr "KcpTun 启用"
+
+msgid "bin:/usr/bin/kcptun/ssr-kcptun"
+msgstr "二进制文件：/usr/bin/kcptun/ssr-kcptun"
+
+msgid "KcpTun Port"
+msgstr "KcpTun 端口"
+
+msgid "KcpTun Param"
+msgstr "KcpTun 参数"
+
+msgid "KcpTun Password"
+msgstr "KcpTun 密码"
+
+msgid "Haven't a Kcptun executable file"
+msgstr "不存在Kcptun可执行文件，请下载Kcptun可执行文件并放入/usr/bin/kcptun/ssr-kcptun"
+
+msgid "Not a Kcptun executable file"
+msgstr "Kcptun可执行文件格式不正确，请确认是否正确下载了路由器对应的可执行文件"
