@@ -22,18 +22,23 @@ ShadowsocksR-libev for OpenWrt
 
 可以和[Shadowsocks][5]共存，在openwrt可以通过luci界面切换使用[Shadowsocks][6]或ShadowsocksR
 
+集成KcpTun，此功能对路由器性能要求较高，请根据情况使用
+
 客户端兼容运行SS或SSR的服务器，使用SS服务器时，传输协议需设置为origin，混淆插件需设置为plain
 
 
 编译
 ---
 
- - 从 OpenWrt 的 [SDK][S] 编译（编译环境：Ubuntu 64位系统），先下载对应平台的SDK
+ - 从 OpenWrt 的 [SDK][S] 编译（编译环境：Ubuntu 64位系统），如果是第一次编译，还需下载OpenWrt所需要的软件
+   sudo apt-get install build-essential asciidoc binutils bzip2 gawk gettext  git libncurses5-dev libz-dev patch unzip zlib1g-dev  subversion git ccache
+ 
+ - 下载路由器对应平台的SDK
 
    ```bash
    # 以 ar71xx 平台为例
-   tar xjf OpenWrt-SDK-ar71xx-for-linux-x86_64-gcc-4.8-linaro_uClibc-0.9.33.2.tar.bz2
-   cd OpenWrt-SDK-ar71xx-*
+   tar xjf OpenWrt-SDK-15.05-ar71xx-generic_gcc-4.8-linaro_uClibc-0.9.33.2.Linux-x86_64.tar.bz2
+   cd OpenWrt-SDK-*
    # 安装 feeds
    ./scripts/feeds update packages
    ./scripts/feeds install libpcre
