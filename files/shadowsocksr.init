@@ -83,22 +83,7 @@ start_rules() {
 	 fi
 	fi
 	
-	#deal kcp
-	local kcp_enable=$(uci_get_by_name $GLOBAL_SERVER kcp_enable)
-	if [ $kcp_enable = "1" ] ;then
-		[ ! -f "/usr/bin/kcptun/ssr-kcptun" ]  &&  return 1
-		chmod 755 /usr/bin/kcptun/ssr-kcptun
-		local kcp_str=`/usr/bin/kcptun/ssr-kcptun -v |grep kcptun|wc -l`
-		[ "0" = $kcp_str ] && return 1
-    local kcp_port=$(uci_get_by_name $GLOBAL_SERVER kcp_port)
-    local server_port=$(uci_get_by_name $GLOBAL_SERVER server_port)
-    local password=$(uci_get_by_name $GLOBAL_SERVER kcp_password)
-    local kcp_param=$(uci_get_by_name $GLOBAL_SERVER kcp_param)
-    [ "$password" != "" ] && password="--key "${password}
-    service_start /usr/bin/kcptun/ssr-kcptun -r $server:$kcp_port -l :$server_port  $password $kcp_param 
-    server="127.0.0.1"
-    kcp_enable_flag=1
-	fi
+
 	
 	local local_port=$(uci_get_by_name $GLOBAL_SERVER local_port)
 	local lan_ac_ips=$(uci_get_by_type access_control lan_ac_ips)
@@ -126,6 +111,23 @@ start_rules() {
 		-w "$(uci_get_by_type access_control wan_fw_ips)" \
 		-e "$(uci_get_by_type access_control ipt_ext)" \
 		-o $ARG_UDP
+		
+	#deal kcp
+	local kcp_enable=$(uci_get_by_name $GLOBAL_SERVER kcp_enable)
+	if [ $kcp_enable = "1" ] ;then
+		[ ! -f "/usr/bin/kcptun/ssr-kcptun" ]  &&  return 1
+		chmod 755 /usr/bin/kcptun/ssr-kcptun
+		local kcp_str=`/usr/bin/kcptun/ssr-kcptun -v |grep kcptun|wc -l`
+		[ "0" = $kcp_str ] && return 1
+    local kcp_port=$(uci_get_by_name $GLOBAL_SERVER kcp_port)
+    local server_port=$(uci_get_by_name $GLOBAL_SERVER server_port)
+    local password=$(uci_get_by_name $GLOBAL_SERVER kcp_password)
+    local kcp_param=$(uci_get_by_name $GLOBAL_SERVER kcp_param)
+    [ "$password" != "" ] && password="--key "${password}
+    service_start /usr/bin/kcptun/ssr-kcptun -r $server:$kcp_port -l :$server_port  $password $kcp_param 
+    kcp_enable_flag=1
+	fi
+			
 	return $?
 }
 

@@ -116,7 +116,7 @@ ShadowsocksR-libev for OpenWrt
    obfs           | 字符串     | 混淆插件，默认"plain" [详情参考][3]
    obfs_param     | 字符串     | 混淆插件参数 [详情参考][3]
    
-   如要打开kcptun的日志，可以在kcptun参数栏填入"--log /var/log/kcptun"，日志会保存在此文件中
+   如要打开kcptun的日志，可以在kcptun参数栏填入"--log /var/log/kcptun.log"，日志会保存在此文件中
    
    安装启用后自动分流国内、外流量，如需更新国内IP数据库在openwrt上执行"get_chinaip"命令即可：
    ```
