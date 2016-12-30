@@ -167,12 +167,10 @@ function o.validate(self, value, section)
 end
 
 o = s:option(Value, "kcp_password", translate("KcpTun Password"))
-o:depends("kcp_enable","1")
 o.password = true
 
 o = s:option(Value, "kcp_param", translate("KcpTun Param"))
-o:depends("kcp_enable","1")
-o.default = ""
+o.default = "--nocomp"
 
 
 -- [[ UDP Forward ]]--
