@@ -135,7 +135,7 @@ ShadowsocksR-libev for OpenWrt
 截图  
 ---
 
-![luci000](http://iytc.net/img/ssr3.jpg)
+![luci000](http://iytc.net/img/ssr4.jpg)
 
 
   [1]: https://github.com/breakwa11/shadowsocks-libev
