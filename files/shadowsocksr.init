@@ -10,11 +10,15 @@
 START=90
 STOP=15
 
+SERVICE_DAEMONIZE=1
 NAME=shadowsocksr
 EXTRA_COMMANDS=rules
 CONFIG_FILE=/var/etc/$NAME.json
-CONFIG_SERVER_FILE=/var/etc/${NAME}_s.json
+CONFIG_UDP_FILE=/var/etc/${NAME}_u.json
 server_count=0
+redir_tcp=0
+redir_udp=0
+tunnel_enable=0
 kcp_enable_flag=0
 
 uci_get_by_name() {
@@ -40,7 +44,13 @@ gen_config_file() {
           fi
          fi
          [ $2 = "0" -a  $kcp_enable_flag = "1" ] && hostip="127.0.0.1"
-	cat <<-EOF >$CONFIG_FILE
+         
+         if [ $2 = "0" ] ;then
+         config_file=$CONFIG_FILE
+         else
+         config_file=$CONFIG_UDP_FILE
+         fi
+	cat <<-EOF >$config_file
 		{
 		    
 		    "server": "$hostip",
@@ -85,7 +95,7 @@ start_rules() {
     local password=$(uci_get_by_name $GLOBAL_SERVER kcp_password)
     local kcp_param=$(uci_get_by_name $GLOBAL_SERVER kcp_param)
     [ "$password" != "" ] && password="--key "${password}
-    (/usr/bin/kcptun/ssr-kcptun -r $server:$kcp_port -l :$server_port  $password $kcp_param &)
+    service_start /usr/bin/kcptun/ssr-kcptun -r $server:$kcp_port -l :$server_port  $password $kcp_param 
     server="127.0.0.1"
     kcp_enable_flag=1
 	fi
@@ -125,19 +135,30 @@ start_redir() {
 		*) ARG_OTA="";;
 	esac
 	gen_config_file $GLOBAL_SERVER 0
+	
+	redir_tcp=1
+	local last_config_file=$CONFIG_FILE
+	local pid_file="/var/run/ssr-retcp.pid"
+	
 	if [ "$ARG_UDP" = "-U" ]; then
 		/usr/bin/ssr-redir \
 			-c $CONFIG_FILE $ARG_OTA \
-			-f /var/run/ssr-redir-tcp.pid
+			-f /var/run/ssr-retcp.pid
+		
 		case "$(uci_get_by_name $UDP_RELAY_SERVER auth_enable)" in
 			1|on|true|yes|enabled) ARG_OTA="-A";;
 			*) ARG_OTA="";;
-		esac
+		esac		
 		gen_config_file $UDP_RELAY_SERVER 1
+		last_config_file=$CONFIG_UDP_FILE
+		pid_file="/var/run/ssr-reudp.pid"
+		redir_udp=1
 	fi
-	/usr/bin/ssr-redir \
-		-c $CONFIG_FILE $ARG_OTA $ARG_UDP \
-		-f /var/run/ssr-redir.pid
+	
+		/usr/bin/ssr-redir \
+		-c $last_config_file $ARG_OTA $ARG_UDP \
+		-f $pid_file
+
 	return $?
 }
 
@@ -182,6 +203,7 @@ start_tunnel() {
 		-l $(uci_get_by_type udp_forward tunnel_port 5300) \
 		-L $(uci_get_by_type udp_forward tunnel_forward 8.8.4.4:53) \
 		-f /var/run/ssr-tunnel.pid
+	tunnel_enable=1	
 	return $?
 }
 
@@ -206,9 +228,13 @@ start() {
 	esac
 	fi
 	start_server	
-	if [ $server_count -gt 0 ]
+	if [ $(uci_get_by_type global monitor_enable) = 1 ] ;then
+	let total_count=server_count+redir_tcp+redir_udp+tunnel_enable+kcp_enable_flag
+	if [ $total_count -gt 0 ]
 	then
-	(/usr/bin/ssr-monitor $server_count &)
+	#param:server(count) redir_tcp(0:no,1:yes)  redir_udp(0:no,1:yes) tunnel(0:no,1:yes)
+	service_start /usr/bin/ssr-monitor $server_count $redir_tcp $redir_udp $tunnel_enable $kcp_enable_flag
+	fi
 	fi
 	
 }

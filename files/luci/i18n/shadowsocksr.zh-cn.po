@@ -150,3 +150,7 @@ msgstr "不存在Kcptun可执行文件，请下载Kcptun可执行文件并放入
 
 msgid "Not a Kcptun executable file"
 msgstr "Kcptun可执行文件格式不正确，请确认是否正确下载了路由器对应的可执行文件"
+
+msgid "Enable Process Monitor"
+msgstr "启用进程监控"
+

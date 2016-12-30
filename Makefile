@@ -78,6 +78,8 @@ Package/luci-app-shadowsocksR-Client/prerm = $(call Package/openwrt-ssr/prerm,sh
 
 define Package/luci-app-shadowsocksR-Server/prerm
 #!/bin/sh
+ /etc/init.d/shadowsocksr disable
+ /etc/init.d/shadowsocksr stop
 exit 0
 endef
 
@@ -111,9 +113,9 @@ define Package/luci-app-shadowsocksR-Server/postinst
 #!/bin/sh
 
 if [ -z "$${IPKG_INSTROOT}" ]; then
-	( . /etc/uci-defaults/luci-$(1) ) && rm -f /etc/uci-defaults/luci-$(1)
-	chmod 755 /etc/init.d/$(1) >/dev/null 2>&1
-	/etc/init.d/$(1) enable >/dev/null 2>&1
+	( . /etc/uci-defaults/luci-shadowsocksr ) && rm -f /etc/uci-defaults/luci-shadowsocksr
+	chmod 755 /etc/init.d/shadowsocksr >/dev/null 2>&1
+	/etc/init.d/shadowsocksr enable >/dev/null 2>&1
 fi
 exit 0
 endef

@@ -14,7 +14,7 @@ ShadowsocksR-libev for OpenWrt
 
 软件包包含 [shadowsocksr-libev][1] 的可执行文件,以及luci控制界面  
 
-支持SSR客户端、服务端模式（目前只支持部分混淆模式），服务端支持多端口和进程守护（崩溃后自动重启）
+支持SSR客户端、服务端模式（目前支持部分混淆模式、支持多端口）
 
 支持自动分流，国内IP不走代理，国外IP段走透明代理，不需要再安装chnroute、gfwlist等软件
 
@@ -22,9 +22,11 @@ ShadowsocksR-libev for OpenWrt
 
 可以和[Shadowsocks][5]共存，在openwrt可以通过luci界面切换使用[Shadowsocks][6]或ShadowsocksR
 
-集成KcpTun加速，此功能对路由器性能要求较高，请根据情况使用
+集成[KcpTun加速][4]，此功能对路由器性能要求较高，需下载对应的二进制文件到指定目录，请根据情况使用
 
 客户端兼容运行SS或SSR的服务器，使用SS服务器时，传输协议需设置为origin，混淆插件需设置为plain
+
+所有进程自动守护，崩溃后自动重启
 
 
 编译
@@ -86,7 +88,7 @@ ShadowsocksR-libev for OpenWrt
    键名           | 数据类型   | 说明
    ---------------|------------|-----------------------------------------------
    auth_enable    | 布尔型     | 一次验证开关[0.关闭 1.开启],需要服务端同时支持
-   server         | 主机类型     | 服务器地址, 可以是 IP 或者域名，推荐使用IP地址
+   server         | 主机类型   | 服务器地址, 可以是 IP 或者域名，推荐使用IP地址
    server_port    | 数值       | 服务器端口号, 小于 65535   
    local_port     | 数值       | 本地绑定的端口号, 小于 65535
    timeout        | 数值       | 超时时间（秒）, 默认 60   
@@ -95,6 +97,10 @@ ShadowsocksR-libev for OpenWrt
    protocol       | 字符串     | 传输协议，默认"origin"[详情参考][3]
    obfs           | 字符串     | 混淆插件，默认"plain" [详情参考][3]
    obfs_param     | 字符串     | 混淆插件参数 [详情参考][3]
+   kcp_enable     | 布尔型     | KcpTun开启开关
+   kcp_port       | 数值       | KcpTun服务器端口号, 小于 65535
+   kcp_password   | 字符串     | KcpTun密码，留空表示"it's a secrect"
+   kcp_param      | 字符串     | KcpTun参数[详情参考][4]
    
    服务端：
 
@@ -132,7 +138,7 @@ ShadowsocksR-libev for OpenWrt
   [1]: https://github.com/breakwa11/shadowsocks-libev
   [2]: https://github.com/shadowsocks/luci-app-shadowsocks/wiki/Encrypt-method
   [3]: https://github.com/breakwa11/shadowsocks-rss/wiki/config.json
-  [4]: http://iytc.net/tools/luci-app-shadowsocksR.rar " Chaos Calmer 15.05预编译 IPK 下载" 
+  [4]: https://github.com/xtaci/kcptun
   [5]: https://github.com/shadowsocks/openwrt-shadowsocks
   [6]: https://github.com/shadowsocks/luci-app-shadowsocks  
   [S]: https://wiki.openwrt.org/doc/howto/obtain.firmware.sdk

@@ -95,6 +95,9 @@ o:value("", translate("Disable"))
 o:value("same", translate("Same as Global Server"))
 for k, v in pairs(server_table) do o:value(k, v) end
 
+o = s:option(Flag, "monitor_enable", translate("Enable Process Monitor"))
+o.rmempty = false
+
 -- [[ Servers Setting ]]--
 s = m:section(TypedSection, "servers", translate("Servers Setting"))
 s.anonymous = true
