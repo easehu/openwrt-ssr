@@ -143,7 +143,7 @@ ShadowsocksR-libev for OpenWrt
   [1]: https://github.com/breakwa11/shadowsocks-libev
   [2]: https://github.com/shadowsocks/luci-app-shadowsocks/wiki/Encrypt-method
   [3]: https://github.com/breakwa11/shadowsocks-rss/wiki/config.json
-  [4]: https://github.com/xtaci/kcptun/releases
+  [4]: https://github.com/xtaci/kcptun
   [5]: https://github.com/shadowsocks/openwrt-shadowsocks
   [6]: https://github.com/shadowsocks/luci-app-shadowsocks  
   [7]: https://github.com/bettermanbao/openwrt-kcptun/releases 
