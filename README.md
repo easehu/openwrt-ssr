@@ -77,7 +77,7 @@ ShadowsocksR-libev for OpenWrt
    #opkg update
    #opkg install /tmp/luci-app-shadowsocksR*_all.ipk 
    ```
-要启用KcpTun，需从相关网站（[网站1][4]、[网站2][7]）下载路由器平台对应的二进制文件，并新建/usr/bin/kcptun目录，将文件名改为ssr-kcptun，放入此目录
+要启用KcpTun，需从相关网站（[网站1][4]、[网站2][7]）下载路由器平台对应的二进制文件，并将文件名改为ssr-kcptun，放入/usr/bin目录
 
 配置
 ---
@@ -116,7 +116,8 @@ ShadowsocksR-libev for OpenWrt
    obfs           | 字符串     | 混淆插件，默认"plain" [详情参考][3]
    obfs_param     | 字符串     | 混淆插件参数 [详情参考][3]
    
-   如要打开kcptun的日志，可以在kcptun参数栏填入"--log /var/log/kcptun.log"，日志会保存在此文件中
+   openwrt上的kcptun好像启用压缩后有问题，因此在界面上缺省加上了“--nocomp”参数，设置为非压缩，请在服务端也使用非压缩模式
+   如要打开kcptun的日志，可以在kcptun参数栏填入"--log /var/log/kcptun.log"，日志会保存在指定文件中
    
    安装启用后自动分流国内、外流量，如需更新国内IP数据库在openwrt上执行"get_chinaip"命令即可：
    ```
