@@ -7,22 +7,22 @@ ShadowsocksR-libev for OpenWrt
 
  本项目是 [shadowsocksr-libev][1] 在 OpenWrt 上的移植  
  
- 各平台预编译IPK请在release页面下载
+ 各平台预编译IPK请在本项目releases页面下载
 
 特性
 ---
 
 软件包包含 [shadowsocksr-libev][1] 的可执行文件,以及luci控制界面  
 
-支持SSR客户端、服务端模式（目前支持部分混淆模式、支持多端口）
+支持SSR客户端、服务端模式（服务端支持部分混淆模式、支持多端口）
 
-支持自动分流，国内IP不走代理，国外IP段走透明代理，不需要再安装chnroute、gfwlist等软件
+支持自动分流，国内IP不走代理，国外IP段走透明代理，不需要再安装chnroute等软件
 
 支持本地域名污染情况下的远程服务器解析，多数情况下无需对dns进行处理
 
 可以和[Shadowsocks][5]共存，在openwrt可以通过luci界面切换使用[Shadowsocks][6]或ShadowsocksR
 
-集成[KcpTun加速][4]，此功能对路由器性能要求较高，需下载对应的二进制文件到指定目录，请根据情况使用
+集成[KcpTun加速][4]，此功能对路由器性能要求较高，需下载对应的二进制文件到路由器指定目录，请酌情使用
 
 客户端兼容运行SS或SSR的服务器，使用SS服务器时，传输协议需设置为origin，混淆插件需设置为plain
 
@@ -32,7 +32,7 @@ ShadowsocksR-libev for OpenWrt
 编译
 ---
 
- - 从 OpenWrt 的 [SDK][S] 编译（编译环境：Ubuntu 64位系统），如果是第一次编译，还需下载OpenWrt所需要的软件
+ - 从 OpenWrt 的 [SDK][S] 编译（编译环境：Ubuntu 64位系统），如果是第一次编译，还需下载OpenWrt所需依赖软件
    ```bash
    sudo apt-get install build-essential asciidoc binutils bzip2 gawk gettext  git libncurses5-dev libz-dev patch unzip zlib1g-dev  subversion git ccache
    ```
@@ -77,7 +77,7 @@ ShadowsocksR-libev for OpenWrt
    #opkg update
    #opkg install /tmp/luci-app-shadowsocksR*_all.ipk 
    ```
-要启用KcpTun，需从相关网站（[网站1][4]、[网站2][7]）下载路由器平台对应的二进制文件，并将文件名改为ssr-kcptun，放入/usr/bin目录
+要启用KcpTun，需从本项目releases页面或相关网站（[网站1][4]、[网站2][7]）下载路由器平台对应的二进制文件，并将文件名改为ssr-kcptun，放入/usr/bin目录
 
 配置
 ---
@@ -116,10 +116,11 @@ ShadowsocksR-libev for OpenWrt
    obfs           | 字符串     | 混淆插件，默认"plain" [详情参考][3]
    obfs_param     | 字符串     | 混淆插件参数 [详情参考][3]
    
-   openwrt上的kcptun好像启用压缩后有问题，因此在界面上缺省加上了“--nocomp”参数，设置为非压缩，请在服务端也使用非压缩模式
-   如要打开kcptun的日志，可以在kcptun参数栏填入"--log /var/log/kcptun.log"，日志会保存在指定文件中
+   某些openwrt上的kcptun在启用压缩后存在问题，因此在界面上缺省加上了“--nocomp”参数，缺省为非压缩，请在服务端也使用非压缩模式
    
-   安装启用后自动分流国内、外流量，如需更新国内IP数据库在openwrt上执行"get_chinaip"命令即可：
+   如要打开kcptun的日志，可以在kcptun参数栏填入"--nocomp --log /var/log/kcptun.log"，日志会保存在指定文件中
+   
+   安装启用后自动分流国内、外流量，如需更新国内IP数据库，在openwrt上执行"get_chinaip"命令即可：
    ```
     # get_chinaip  
                                                                                                            
@@ -136,13 +137,13 @@ ShadowsocksR-libev for OpenWrt
 截图  
 ---
 
-![luci000](http://iytc.net/img/ssr4.jpg)
+![luci000](http://iytc.net/img/ssr5.jpg)
 
 
   [1]: https://github.com/breakwa11/shadowsocks-libev
   [2]: https://github.com/shadowsocks/luci-app-shadowsocks/wiki/Encrypt-method
   [3]: https://github.com/breakwa11/shadowsocks-rss/wiki/config.json
-  [4]: https://github.com/xtaci/kcptun
+  [4]: https://github.com/xtaci/kcptun/releases
   [5]: https://github.com/shadowsocks/openwrt-shadowsocks
   [6]: https://github.com/shadowsocks/luci-app-shadowsocks  
   [7]: https://github.com/bettermanbao/openwrt-kcptun/releases 
