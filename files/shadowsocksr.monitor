@@ -87,7 +87,7 @@ do
       then
       killall -q -9 ssr-kcptun
 
-			( /usr/bin/kcptun/ssr-kcptun -r $server:$kcp_port -l :$server_port  $password $kcp_param &)
+			( /usr/bin/ssr-kcptun -r $server:$kcp_port -l :$server_port  $password $kcp_param &)
       fi   
       fi
 
