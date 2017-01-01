@@ -136,9 +136,11 @@ ShadowsocksR-libev for OpenWrt
 
 截图  
 ---
-
+客户端：
 ![luci000](http://iytc.net/img/ssr6.jpg)
 
+服务端：
+![luci000](http://iytc.net/img/ssr62.jpg)
 
   [1]: https://github.com/breakwa11/shadowsocks-libev
   [2]: https://github.com/shadowsocks/luci-app-shadowsocks/wiki/Encrypt-method
