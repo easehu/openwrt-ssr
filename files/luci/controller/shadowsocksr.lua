@@ -11,7 +11,7 @@ function index()
          if nixio.fs.access("/usr/bin/ssr-redir") 
          then
          entry({"admin", "services", "shadowsocksr"},alias("admin", "services", "shadowsocksr", "client"),_("ShadowSocksR"), 10).dependent = true
-         entry({"admin", "services", "shadowsocksr", "client"},cbi("shadowsocksr/client"),_("Client"), 10).leaf = true
+         entry({"admin", "services", "shadowsocksr", "client"},arcombine(cbi("shadowsocksr/client"), cbi("shadowsocksr/client-config")),_("Client"), 10).leaf = true
          elseif nixio.fs.access("/usr/bin/ssr-server") 
          then 
          entry({"admin", "services", "shadowsocksr"},alias("admin", "services", "shadowsocksr", "server"),_("ShadowSocksR"), 10).dependent = true
@@ -24,7 +24,9 @@ function index()
 		return
 	end
 		
-	entry({"admin", "services", "shadowsocksr", "server"},cbi("shadowsocksr/server"),_("SSR Server"), 20).leaf = true
+	entry({"admin", "services", "shadowsocksr", "server"},arcombine(cbi("shadowsocksr/server"), cbi("shadowsocksr/server-config")),_("SSR Server"), 20).leaf = true
+	
+
 	
 	
 end

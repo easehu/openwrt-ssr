@@ -5,17 +5,10 @@ local m, s, o,kcp_enable
 local shadowsocksr = "shadowsocksr"
 local uci = luci.model.uci.cursor()
 local ipkg = require("luci.model.ipkg")
-local fs = require "nixio.fs"
+
 local sys = require "luci.sys"
 
-local function isKcptun(file)
-    if not fs.access(file, "rwx", "rx", "rx") then
-        fs.chmod(file, 755)
-    end
 
-    local str = sys.exec(file .. " -v | awk '{printf $1}'")
-    return (str:lower() == "kcptun")
-end
 
 if luci.sys.call("pidof ssr-redir >/dev/null") == 0 then
 	m = Map(shadowsocksr, translate("ShadowSocksR Client"), translate("ShadowSocksR is running"))
@@ -101,76 +94,57 @@ o.rmempty = false
 -- [[ Servers Setting ]]--
 s = m:section(TypedSection, "servers", translate("Servers Setting"))
 s.anonymous = true
-s.addremove   = true
-
-o = s:option(Value, "alias", translate("Alias(optional)"))
-
-o = s:option(Flag, "auth_enable", translate("Onetime Authentication"))
-o.rmempty = false
-
-o = s:option(Value, "server", translate("Server Address"))
-o.datatype = "host"
-o.rmempty = false
-
-o = s:option(Value, "server_port", translate("Server Port"))
-o.datatype = "port"
-o.rmempty = false
-
-o = s:option(Value, "local_port", translate("Local Port"))
-o.datatype = "port"
-o.default = 1080
-o.rmempty = false
-
-o = s:option(Value, "timeout", translate("Connection Timeout"))
-o.datatype = "uinteger"
-o.default = 60
-o.rmempty = false
-
-o = s:option(Value, "password", translate("Password"))
-o.password = true
-o.rmempty = false
-
-o = s:option(ListValue, "encrypt_method", translate("Encrypt Method"))
-for _, v in ipairs(encrypt_methods) do o:value(v) end
-o.rmempty = false
-
-o = s:option(ListValue, "protocol", translate("protocol"))
-for _, v in ipairs(protocol) do o:value(v) end
-o.rmempty = false
-
-
-o = s:option(ListValue, "obfs", translate("obfs"))
-for _, v in ipairs(obfs) do o:value(v) end
-o.rmempty = false
-
-o = s:option(Value, "obfs_param", translate("obfs_param(optional)"))
-
-kcp_enable = s:option(Flag, "kcp_enable", translate("KcpTun Enable"), translate("bin:/usr/bin/ssr-kcptun"))
-kcp_enable.rmempty = false
-
-
-o = s:option(Value, "kcp_port", translate("KcpTun Port"))
-o.datatype = "port"
-o.default = 4000
-function o.validate(self, value, section)
-		local kcp_file="/usr/bin/ssr-kcptun"
-		local enable = kcp_enable:formvalue(section) or kcp_enable.disabled
-		if enable == kcp_enable.enabled then
-    if not fs.access(kcp_file)  then
-        return nil, translate("Haven't a Kcptun executable file")
-    elseif  not isKcptun(kcp_file) then
-        return nil, translate("Not a Kcptun executable file")    
-    end
-    end
-
-    return value
+s.addremove = true
+s.sortable = true
+s.template = "cbi/tblsection"
+newconfig = luci.dispatcher.build_url("admin/services/shadowsocksr/client/%s")
+function s.create(...)
+	local sid = TypedSection.create(...)
+	if sid then
+		luci.http.redirect(newconfig % sid)
+		return
+	end
 end
 
-o = s:option(Value, "kcp_password", translate("KcpTun Password"))
-o.password = true
+o = s:option(DummyValue, "alias", translate("Alias"))
+function o.cfgvalue(...)
+	return Value.cfgvalue(...) or translate("None")
+end
 
-o = s:option(Value, "kcp_param", translate("KcpTun Param"))
-o.default = "--nocomp"
+
+o = s:option(DummyValue, "server", translate("Server Address"))
+function o.cfgvalue(...)
+	return Value.cfgvalue(...) or "?"
+end
+
+o = s:option(DummyValue, "server_port", translate("Server Port"))
+function o.cfgvalue(...)
+	return Value.cfgvalue(...) or "?"
+end
+
+
+
+o = s:option(DummyValue, "encrypt_method", translate("Encrypt Method"))
+function o.cfgvalue(...)
+	return Value.cfgvalue(...) or "?"
+end
+
+o = s:option(DummyValue, "protocol", translate("protocol"))
+function o.cfgvalue(...)
+	return Value.cfgvalue(...) or "?"
+end
+
+
+o = s:option(DummyValue, "obfs", translate("obfs"))
+function o.cfgvalue(...)
+	return Value.cfgvalue(...) or "?"
+end
+
+o = s:option(DummyValue, "kcp_enable", translate("KcpTun Enable"))
+function o.cfgvalue(...)
+	return Value.cfgvalue(...) or "?"
+end
+
 
 
 -- [[ UDP Forward ]]--

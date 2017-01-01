@@ -67,45 +67,55 @@ o.rmempty = false
 -- [[ Server Setting ]]--
 s = m:section(TypedSection, "server_config", translate("Server Setting"))
 s.anonymous = true
-s.addremove   = true
+s.addremove = true
+s.sortable = true
+s.template = "cbi/tblsection"
+s.extedit = luci.dispatcher.build_url("admin/services/shadowsocksr/server/%s")
+function s.create(...)
+	local sid = TypedSection.create(...)
+	if sid then
+		luci.http.redirect(s.extedit % sid)
+		return
+	end
+end
 
 o = s:option(Flag, "enable", translate("Enable"))
-o.default = 1
+function o.cfgvalue(...)
+	return Value.cfgvalue(...) or translate("0")
+end
 o.rmempty = false
 
-o = s:option(Value, "server", translate("Server Address"))
-o.datatype = "ipaddr"
-o.default = "0.0.0.0"
-o.rmempty = false
+o = s:option(DummyValue, "server", translate("Server Address"))
+function o.cfgvalue(...)
+	return Value.cfgvalue(...) or "?"
+end
 
-o = s:option(Value, "server_port", translate("Server Port"))
-o.datatype = "port"
-o.default = 8388
-o.rmempty = false
-
-o = s:option(Value, "timeout", translate("Connection Timeout"))
-o.datatype = "uinteger"
-o.default = 60
-o.rmempty = false
-
-o = s:option(Value, "password", translate("Password"))
-o.password = true
-o.rmempty = false
-
-o = s:option(ListValue, "encrypt_method", translate("Encrypt Method"))
-for _, v in ipairs(encrypt_methods) do o:value(v) end
-o.rmempty = false
-
-o = s:option(ListValue, "protocol", translate("protocol"))
-for _, v in ipairs(protocol) do o:value(v) end
-o.rmempty = false
+o = s:option(DummyValue, "server_port", translate("Server Port"))
+function o.cfgvalue(...)
+	return Value.cfgvalue(...) or "?"
+end
 
 
-o = s:option(ListValue, "obfs", translate("obfs"))
-for _, v in ipairs(obfs) do o:value(v) end
-o.rmempty = false
+o = s:option(DummyValue, "encrypt_method", translate("Encrypt Method"))
+function o.cfgvalue(...)
+	local v = Value.cfgvalue(...)
+	return v and v:upper() or "?"
+end
 
-o = s:option(Value, "obfs_param", translate("obfs_param(optional)"))
+o = s:option(DummyValue, "protocol", translate("protocol"))
+function o.cfgvalue(...)
+	return Value.cfgvalue(...) or "?"
+end
+
+
+
+o = s:option(DummyValue, "obfs", translate("obfs"))
+function o.cfgvalue(...)
+	return Value.cfgvalue(...) or "?"
+end
+
+
+
 
 
 return m
