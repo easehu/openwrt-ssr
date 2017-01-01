@@ -180,7 +180,13 @@ EOF
 
 
 start_service() {
+[ $(uci_get_by_name $1 enable) = "0"  ]  && return 1
 let server_count=server_count+1
+if [ $server_count = 1 ] ;then
+iptables -N SSR-SERVER-RULE
+iptables -t filter -I INPUT  -j SSR-SERVER-RULE
+fi
+
 gen_service_file $1 /var/etc/${NAME}_${server_count}.json
 /usr/bin/ssr-server -c /var/etc/${NAME}_${server_count}.json -u -f /var/run/ssr-server${server_count}.pid 
 iptables -t filter -A SSR-SERVER-RULE -p tcp --dport $(uci_get_by_name $1 server_port) -j ACCEPT
@@ -192,8 +198,7 @@ start_server() {
   SERVER_ENABLE=$(uci_get_by_type server_global enable_server)
   [ "$SERVER_ENABLE" = 0 ] && return 0
 	mkdir -p /var/run /var/etc
-	iptables -N SSR-SERVER-RULE
-	iptables -t filter -I INPUT  -j SSR-SERVER-RULE
+
 	config_load $NAME
 	config_foreach start_service server_config
 	
