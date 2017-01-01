@@ -183,7 +183,8 @@ start_service() {
 let server_count=server_count+1
 gen_service_file $1 /var/etc/${NAME}_${server_count}.json
 /usr/bin/ssr-server -c /var/etc/${NAME}_${server_count}.json -u -f /var/run/ssr-server${server_count}.pid 
-
+iptables -t filter -A SSR-SERVER-RULE -p tcp --dport $(uci_get_by_name $1 server_port) -j ACCEPT
+iptables -t filter -A SSR-SERVER-RULE -p udp --dport $(uci_get_by_name $1 server_port) -j ACCEPT
 return 0
 }
 
@@ -191,6 +192,8 @@ start_server() {
   SERVER_ENABLE=$(uci_get_by_type server_global enable_server)
   [ "$SERVER_ENABLE" = 0 ] && return 0
 	mkdir -p /var/run /var/etc
+	iptables -N SSR-SERVER-RULE
+	iptables -t filter -I INPUT  -j SSR-SERVER-RULE
 	config_load $NAME
 	config_foreach start_service server_config
 	
@@ -241,6 +244,12 @@ start() {
 
 stop() {
 	/usr/bin/ssr-rules -f
+	srulecount=`iptables -L|grep SSR-SERVER-RULE|wc -l`
+	if [ $srulecount -gt 0 ] ;then
+	iptables -F SSR-SERVER-RULE
+	iptables -t filter -D INPUT  -j SSR-SERVER-RULE
+	iptables -X SSR-SERVER-RULE
+	fi
 	killall -q -9 ssr-kcptun
 	killall -q -9 ssr-monitor
 	killall -q -9 ssr-redir
