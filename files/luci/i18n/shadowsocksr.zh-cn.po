@@ -22,8 +22,8 @@ msgstr "全局设置"
 msgid "Global Server"
 msgstr "全局服务器"
 
-msgid "Disable ShadowSocksR Client"
-msgstr "停用 ShadowSocksR 客户端"
+msgid "ShadowSocksR SOCK5 Proxy is running"
+msgstr "ShadowSocksR SOCK5代理运行中"
 
 msgid "UDP Relay Server"
 msgstr "UDP中继服务器"
@@ -67,14 +67,14 @@ msgstr "混淆插件"
 msgid "obfs_param(optional)"
 msgstr "混淆参数（可选）"
 
-msgid "UDP Forward"
-msgstr "UDP转发"
+msgid "Enable Tunnel(DNS)"
+msgstr "启用（DNS）隧道转发"
 
-msgid "UDP Local Port"
-msgstr "UDP本地端口"
+msgid "Tunnel Port"
+msgstr "隧道本地端口"
 
 msgid "Forwarding Tunnel"
-msgstr "UDP转发地址"
+msgstr "隧道转发地址"
 
 msgid "Access Control"
 msgstr "访问控制"
@@ -109,7 +109,7 @@ msgstr "仅允许列表外"
 msgid "LAN Host List"
 msgstr "内网主机列表"
 
-msgid "Client"
+msgid "SSR Client"
 msgstr "客户端"
 
 msgid "SSR Server"
@@ -159,3 +159,9 @@ msgstr "编辑服务器配置
 
 msgid "Alias"
 msgstr "别名"
+
+msgid "SOCKS5 Proxy"
+msgstr "SOCKS5代理"
+
+msgid "Server"
+msgstr "服务器"

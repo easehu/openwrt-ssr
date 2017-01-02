@@ -12,6 +12,8 @@ local sys = require "luci.sys"
 
 if luci.sys.call("pidof ssr-redir >/dev/null") == 0 then
 	m = Map(shadowsocksr, translate("ShadowSocksR Client"), translate("ShadowSocksR is running"))
+elseif 	luci.sys.call("pidof ssr-local >/dev/null") == 0 then
+	m = Map(shadowsocksr, translate("ShadowSocksR Client"), translate("ShadowSocksR SOCK5 Proxy is running"))
 else
 	m = Map(shadowsocksr, translate("ShadowSocksR Client"), translate("ShadowSocksR is not running"))
 end
@@ -73,23 +75,7 @@ uci:foreach(shadowsocksr, "servers", function(s)
 	end
 end)
 
--- [[ Global Setting ]]--
-s = m:section(TypedSection, "global", translate("Global Setting"))
-s.anonymous = true
 
-o = s:option(ListValue, "global_server", translate("Global Server"))
-o:value("nil", translate("Disable ShadowSocksR Client"))
-for k, v in pairs(server_table) do o:value(k, v) end
-o.default = "nil"
-o.rmempty = false
-
-o = s:option(ListValue, "udp_relay_server", translate("UDP Relay Server"))
-o:value("", translate("Disable"))
-o:value("same", translate("Same as Global Server"))
-for k, v in pairs(server_table) do o:value(k, v) end
-
-o = s:option(Flag, "monitor_enable", translate("Enable Process Monitor"))
-o.rmempty = false
 
 -- [[ Servers Setting ]]--
 s = m:section(TypedSection, "servers", translate("Servers Setting"))
@@ -146,17 +132,30 @@ function o.cfgvalue(...)
 	return Value.cfgvalue(...) or "?"
 end
 
-
-
--- [[ UDP Forward ]]--
-s = m:section(TypedSection, "udp_forward", translate("UDP Forward"))
+-- [[ Global Setting ]]--
+s = m:section(TypedSection, "global", translate("Global Setting"))
 s.anonymous = true
 
-o = s:option(Flag, "tunnel_enable", translate("Enable"))
+o = s:option(ListValue, "global_server", translate("Global Server"))
+o:value("nil", translate("Disable"))
+for k, v in pairs(server_table) do o:value(k, v) end
+o.default = "nil"
+o.rmempty = false
+
+o = s:option(ListValue, "udp_relay_server", translate("UDP Relay Server"))
+o:value("", translate("Disable"))
+o:value("same", translate("Same as Global Server"))
+for k, v in pairs(server_table) do o:value(k, v) end
+
+o = s:option(Flag, "monitor_enable", translate("Enable Process Monitor"))
+o.rmempty = false
+
+
+o = s:option(Flag, "tunnel_enable", translate("Enable Tunnel(DNS)"))
 o.default = 0
 o.rmempty = false
 
-o = s:option(Value, "tunnel_port", translate("UDP Local Port"))
+o = s:option(Value, "tunnel_port", translate("Tunnel Port"))
 o.datatype = "port"
 o.default = 5300
 o.rmempty = false
@@ -164,6 +163,22 @@ o.rmempty = false
 o = s:option(Value, "tunnel_forward", translate("Forwarding Tunnel"))
 o.default = "8.8.4.4:53"
 o.rmempty = false
+
+-- [[ SOCKS5 Proxy ]]--
+s = m:section(TypedSection, "socks5_proxy", translate("SOCKS5 Proxy"))
+s.anonymous = true
+
+o = s:option(ListValue, "server", translate("Server"))
+o:value("nil", translate("Disable"))
+for k, v in pairs(server_table) do o:value(k, v) end
+o.default = "nil"
+o.rmempty = false
+
+o = s:option(Value, "local_port", translate("Local Port"))
+o.datatype = "port"
+o.default = 1234
+o.rmempty = false
+
 
 -- [[ Access Control ]]--
 s = m:section(TypedSection, "access_control", translate("Access Control"))
