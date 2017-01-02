@@ -97,5 +97,7 @@ o.rmempty = false
 
 o = s:option(Value, "obfs_param", translate("obfs_param(optional)"))
 
+o = s:option(Flag, "fast_open", translate("TCP Fast Open"))
+o.rmempty = false
 
 return m

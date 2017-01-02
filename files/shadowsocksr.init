@@ -56,6 +56,11 @@ gen_config_file() {
          else
          config_file=$CONFIG_SOCK5_FILE
          fi
+         if [ $(uci_get_by_name $1 fast_open) = "1" ] ;then
+         fastopen="true";
+         else
+         fastopen="false";
+         fi
 	cat <<-EOF >$config_file
 		{
 		    
@@ -68,7 +73,8 @@ gen_config_file() {
 		    "method": "$(uci_get_by_name $1 encrypt_method)",
 		    "protocol": "$(uci_get_by_name $1 protocol)",
 		    "obfs": "$(uci_get_by_name $1 obfs)",
-		    "obfs_param": "$(uci_get_by_name $1 obfs_param)"
+		    "obfs_param": "$(uci_get_by_name $1 obfs_param)",
+		    "fast_open": $fastopen
 		}
 EOF
 }
@@ -169,7 +175,11 @@ start_redir() {
 }
 
 gen_service_file() {
-         
+	if [ $(uci_get_by_name $1 fast_open) = "1" ] ;then
+	fastopen="true";
+	else
+	fastopen="false";
+	fi       
 	cat <<-EOF >$2
 		{
 		    "server": "$(uci_get_by_name $1 server)",
@@ -179,7 +189,8 @@ gen_service_file() {
 		    "method": "$(uci_get_by_name $1 encrypt_method)",
 		    "protocol": "$(uci_get_by_name $1 protocol)",
 		    "obfs": "$(uci_get_by_name $1 obfs)",
-		    "obfs_param": "$(uci_get_by_name $1 obfs_param)"
+		    "obfs_param": "$(uci_get_by_name $1 obfs_param)",
+		    "fast_open": $fastopen
 		}
 EOF
 }

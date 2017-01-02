@@ -165,3 +165,6 @@ msgstr "SOCKS5代理"
 
 msgid "Server"
 msgstr "服务器"
+
+msgid "TCP Fast Open"
+msgstr "TCP快速打开"

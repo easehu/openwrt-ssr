@@ -119,6 +119,9 @@ o.rmempty = false
 
 o = s:option(Value, "obfs_param", translate("obfs_param(optional)"))
 
+o = s:option(Flag, "fast_open", translate("TCP Fast Open"))
+o.rmempty = false
+
 kcp_enable = s:option(Flag, "kcp_enable", translate("KcpTun Enable"), translate("bin:/usr/bin/ssr-kcptun"))
 kcp_enable.rmempty = false
 
