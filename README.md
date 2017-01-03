@@ -100,6 +100,7 @@ ShadowsocksR-libev for OpenWrt
    protocol       | 字符串     | 传输协议，默认"origin"[详情参考][3]
    obfs           | 字符串     | 混淆插件，默认"plain" [详情参考][3]
    obfs_param     | 字符串     | 混淆插件参数 [详情参考][3]
+   fast_open      | 布尔型     | TCP快速打开 [详情参考][3]
    kcp_enable     | 布尔型     | KcpTun开启开关
    kcp_port       | 数值       | KcpTun服务器端口号, 小于 65535
    kcp_password   | 字符串     | KcpTun密码，留空表示"it's a secrect"
@@ -117,6 +118,7 @@ ShadowsocksR-libev for OpenWrt
    protocol       | 字符串     | 传输协议，默认"origin"[详情参考][3]
    obfs           | 字符串     | 混淆插件，默认"plain" [详情参考][3]
    obfs_param     | 字符串     | 混淆插件参数 [详情参考][3]
+   fast_open      | 布尔型     | TCP快速打开 [详情参考][3]
    
    某些openwrt上的kcptun在启用压缩后存在问题，因此在界面上缺省加上了“--nocomp”参数，缺省为非压缩，请在服务端也使用非压缩模式
    
@@ -139,7 +141,7 @@ ShadowsocksR-libev for OpenWrt
 截图  
 ---
 客户端：
-![luci000](http://iytc.net/img/ssr6.jpg)
+![luci000](http://iytc.net/img/ssr7.jpg)
 
 服务端：
 ![luci000](http://iytc.net/img/ssr62.jpg)
