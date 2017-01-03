@@ -92,7 +92,7 @@ o.rmempty = false
 
 o = s:option(Value, "local_port", translate("Local Port"))
 o.datatype = "port"
-o.default = 1080
+o.default = 1234
 o.rmempty = false
 
 o = s:option(Value, "timeout", translate("Connection Timeout"))

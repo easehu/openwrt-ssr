@@ -16,9 +16,7 @@ ShadowsocksR-libev for OpenWrt
 
 支持SSR客户端、服务端模式（服务端支持部分混淆模式、支持多端口）
 
-支持自动分流，国内IP不走代理，国外IP段走透明代理，不需要再安装chnroute等软件
-
-支持本地域名污染情况下的远程服务器解析，多数情况下无需对dns进行处理
+支持GFWList，列表中的网站走透明代理，其他网站不走代理
 
 可以和[Shadowsocks][5]共存，在openwrt可以通过luci界面切换使用[Shadowsocks][6]或ShadowsocksR
 
@@ -52,6 +50,7 @@ ShadowsocksR-libev for OpenWrt
    #luci ->3. Applications-> luci-app-shadowsocksR         包含客户端和服务端
    #luci ->3. Applications-> luci-app-shadowsocksR-Client  只包含客户端
    #luci ->3. Applications-> luci-app-shadowsocksR-Server  只包含服务端
+   #luci ->3. Applications-> luci-app-shadowsocksR-GFW     GFWList模式
    make menuconfig
    
    #如果没有安装po2lmo，则安装（可选）
@@ -67,15 +66,21 @@ ShadowsocksR-libev for OpenWrt
    
 安装
 --- 
-本软件包依赖库：libopenssl、libpthread、ipset、ip、iptables-mod-tproxy、libpcre，opkg会自动安装
+本软件包依赖库：libopenssl、libpthread、ipset、ip、iptables-mod-tproxy、libpcre、dnsmasq-full，opkg会自动安装
 
-软件编译后可生成三个软件包，分别是luci-app-shadowsocksR（含客户端和服务端）、luci-app-shadowsocksR-client（只含客户端）、luci-app-shadowsocksR-Server（只含服务端），用户根据需要或路由器空间大小选择其中一个安装即可
+软件编译后可生成四个软件包，分别是luci-app-shadowsocksR（含客户端和服务端）、luci-app-shadowsocksR-client（只含客户端）、luci-app-shadowsocksR-Server（只含服务端）、luci-app-shadowsocksR-GFW（GFW模式），用户根据需要或路由器空间大小选择其中一个安装即可
 
 先将编译成功的luci-app-shadowsocksR*_all.ipk通过winscp上传到路由器的/tmp目录，执行命令：
 
-   ```
-   #opkg update
-   #opkg install /tmp/luci-app-shadowsocksR*_all.ipk 
+   ```bash
+   #刷新opkg列表
+   opkg update
+   
+   #删除dnsmasq（GFW模式第一次安装需手动卸载dnsmasq，并安装dnsmasq-full，其他情况可选）
+   opkg remove dnsmasq && opkg install dnsmasq-full
+   
+   #安装软件包
+   opkg install /tmp/luci-app-shadowsocksR*_all.ipk 
    ```
 要启用KcpTun，需从本项目releases页面或相关网站（[网站1][4]、[网站2][7]）下载路由器平台对应的二进制文件，并将文件名改为ssr-kcptun，放入/usr/bin目录
 
@@ -124,15 +129,6 @@ ShadowsocksR-libev for OpenWrt
    
    如要打开kcptun的日志，可以在kcptun参数栏填入"--nocomp --log /var/log/kcptun.log"，日志会保存在指定文件中
    
-   安装启用后自动分流国内、外流量，如需更新国内IP数据库，在openwrt上执行"get_chinaip"命令即可：
-   ```
-    # get_chinaip  
-                                                                                                           
-      Connecting to ftp.apnic.net (202.12.29.205:80)                                                                                      
-
-         
-   ```
-   注：此数据库一般无需刷新，如果刷新必须等待上面的命令运行完成，否则可能损坏数据库
 
 问题和建议反馈
 ---
