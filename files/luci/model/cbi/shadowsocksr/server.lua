@@ -1,4 +1,4 @@
--- Copyright (C) 2016 yushi studio <ywb94@qq.com>
+-- Copyright (C) 2017 yushi studio <ywb94@qq.com>
 -- Licensed to the public under the GNU General Public License v3.
 
 local m, s, o
@@ -6,12 +6,8 @@ local shadowsocksr = "shadowsocksr"
 local uci = luci.model.uci.cursor()
 local ipkg = require("luci.model.ipkg")
 
-if luci.sys.call("pidof ssr-server >/dev/null") == 0 then
-	m = Map(shadowsocksr, translate("ShadowSocksR Server"), translate("ShadowSocksR Server is running"))
-else
-	m = Map(shadowsocksr, translate("ShadowSocksR Server"), translate("ShadowSocksR Server is not running"))
-end
 
+m = Map(shadowsocksr, translate("ShadowSocksR Server"))
 
 local encrypt_methods = {
 	"table",
@@ -102,14 +98,14 @@ function o.cfgvalue(...)
 	return v and v:upper() or "?"
 end
 
-o = s:option(DummyValue, "protocol", translate("protocol"))
+o = s:option(DummyValue, "protocol", translate("Protocol"))
 function o.cfgvalue(...)
 	return Value.cfgvalue(...) or "?"
 end
 
 
 
-o = s:option(DummyValue, "obfs", translate("obfs"))
+o = s:option(DummyValue, "obfs", translate("Obfs"))
 function o.cfgvalue(...)
 	return Value.cfgvalue(...) or "?"
 end

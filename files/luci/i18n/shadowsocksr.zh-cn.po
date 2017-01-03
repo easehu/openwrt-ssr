@@ -58,13 +58,13 @@ msgstr "密码"
 msgid "Encrypt Method"
 msgstr "加密方式"
 
-msgid "protocol"
+msgid "Protocol"
 msgstr "传输协议"
 
-msgid "obfs"
+msgid "Obfs"
 msgstr "混淆插件"
 
-msgid "obfs_param(optional)"
+msgid "Obfs param(optional)"
 msgstr "混淆参数（可选）"
 
 msgid "Enable Tunnel(DNS)"
@@ -168,3 +168,43 @@ msgstr "服务器"
 
 msgid "TCP Fast Open"
 msgstr "TCP快速打开"
+
+msgid "Status"
+msgstr "状态"
+
+msgid "Unknown"
+msgstr "未知"
+
+msgid "Running Status"
+msgstr "运行状态"
+
+msgid "Global Client"
+msgstr "全局客户端"
+
+msgid "Global Server"
+msgstr "全局服务端"
+
+msgid "UDP Tunnel"
+msgstr "UDP 隧道"
+
+msgid "IPK Version"
+msgstr "IPK 版本号"
+
+msgid "KcpTun Version"
+msgstr "KcpTun 版本号"
+
+msgid "Not exist"
+msgstr "不存在"
+
+msgid "IPK Installation Time"
+msgstr "IPK 安装时间"
+
+msgid "Project"
+msgstr "项目地址"
+
+msgid "Not Running"
+msgstr "未运行"
+
+msgid "Running"
+msgstr "运行中"
+

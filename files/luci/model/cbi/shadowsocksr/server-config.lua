@@ -1,4 +1,4 @@
--- Copyright (C) 2016 yushi studio <ywb94@qq.com>
+-- Copyright (C) 2017 yushi studio <ywb94@qq.com>
 -- Licensed to the public under the GNU General Public License v3.
 
 local m, s, o
@@ -86,16 +86,16 @@ o = s:option(ListValue, "encrypt_method", translate("Encrypt Method"))
 for _, v in ipairs(encrypt_methods) do o:value(v) end
 o.rmempty = false
 
-o = s:option(ListValue, "protocol", translate("protocol"))
+o = s:option(ListValue, "protocol", translate("Protocol"))
 for _, v in ipairs(protocol) do o:value(v) end
 o.rmempty = false
 
 
-o = s:option(ListValue, "obfs", translate("obfs"))
+o = s:option(ListValue, "obfs", translate("Obfs"))
 for _, v in ipairs(obfs) do o:value(v) end
 o.rmempty = false
 
-o = s:option(Value, "obfs_param", translate("obfs_param(optional)"))
+o = s:option(Value, "obfs_param", translate("Obfs param(optional)"))
 
 o = s:option(Flag, "fast_open", translate("TCP Fast Open"))
 o.rmempty = false

@@ -20,11 +20,12 @@ function index()
          end  
 	
 
-	if not nixio.fs.access("/usr/bin/ssr-server") then
-		return
+	if nixio.fs.access("/usr/bin/ssr-server") then
+	entry({"admin", "services", "shadowsocksr", "server"},arcombine(cbi("shadowsocksr/server"), cbi("shadowsocksr/server-config")),_("SSR Server"), 20).leaf = true
 	end
 		
-	entry({"admin", "services", "shadowsocksr", "server"},arcombine(cbi("shadowsocksr/server"), cbi("shadowsocksr/server-config")),_("SSR Server"), 20).leaf = true
+
+	entry({"admin", "services", "shadowsocksr", "about"},cbi("shadowsocksr/status"),_("Status"), 30).leaf = true
 	
 
 	

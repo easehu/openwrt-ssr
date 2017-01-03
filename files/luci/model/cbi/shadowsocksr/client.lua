@@ -1,4 +1,4 @@
--- Copyright (C) 2016 yushi studio <ywb94@qq.com> github.com/ywb94
+-- Copyright (C) 2017 yushi studio <ywb94@qq.com> github.com/ywb94
 -- Licensed to the public under the GNU General Public License v3.
 
 local m, s, o,kcp_enable
@@ -10,14 +10,7 @@ local sys = require "luci.sys"
 
 
 
-if luci.sys.call("pidof ssr-redir >/dev/null") == 0 then
-	m = Map(shadowsocksr, translate("ShadowSocksR Client"), translate("ShadowSocksR is running"))
-elseif 	luci.sys.call("pidof ssr-local >/dev/null") == 0 then
-	m = Map(shadowsocksr, translate("ShadowSocksR Client"), translate("ShadowSocksR SOCK5 Proxy is running"))
-else
-	m = Map(shadowsocksr, translate("ShadowSocksR Client"), translate("ShadowSocksR is not running"))
-end
-
+m = Map(shadowsocksr, translate("ShadowSocksR Client"))
 
 local server_table = {}
 local arp_table = luci.sys.net.arptable() or {}
@@ -116,13 +109,13 @@ function o.cfgvalue(...)
 	return Value.cfgvalue(...) or "?"
 end
 
-o = s:option(DummyValue, "protocol", translate("protocol"))
+o = s:option(DummyValue, "protocol", translate("Protocol"))
 function o.cfgvalue(...)
 	return Value.cfgvalue(...) or "?"
 end
 
 
-o = s:option(DummyValue, "obfs", translate("obfs"))
+o = s:option(DummyValue, "obfs", translate("Obfs"))
 function o.cfgvalue(...)
 	return Value.cfgvalue(...) or "?"
 end
