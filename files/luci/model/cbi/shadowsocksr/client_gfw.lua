@@ -143,19 +143,10 @@ for k, v in pairs(server_table) do o:value(k, v) end
 o = s:option(Flag, "monitor_enable", translate("Enable Process Monitor"))
 o.rmempty = false
 
-o = s:option(Flag, "gfw_enable", translate("Enable GFW mode "))
+o = s:option(ListValue, "gfw_enable", translate("Operating mode"))
+o:value("router", translate("IP Route Mode"))
+o:value("gfw", translate("GFW List Mode"))
 o.rmempty = false
-
-o = s:option(Flag, "tunnel_enable", translate("Enable Tunnel(DNS)"))
-o:depends ("gfw_enable", "")
-o.default = 0
-o.rmempty = false
-
-o = s:option(Value, "tunnel_port", translate("Tunnel Port"))
-o:depends ("gfw_enable", "")
-o.datatype = "port"
-o.default = 5353
-
 
 o = s:option(Value, "tunnel_forward", translate("Forwarding Tunnel"))
 o.default = "8.8.4.4:53"
@@ -186,7 +177,6 @@ s:tab("wan_ac", translate("Interfaces - WAN"))
 
 o = s:taboption("wan_ac", Value, "wan_bp_list", translate("Bypassed IP List"))
 o:value("/dev/null", translate("NULL - As Global Proxy"))
-
 o.default = "/dev/null"
 o.rmempty = false
 

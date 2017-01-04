@@ -181,11 +181,11 @@ msgstr "运行状态"
 msgid "Global Client"
 msgstr "全局客户端"
 
-msgid "Global Server"
-msgstr "全局服务端"
+msgid "Global SSR Server"
+msgstr "SSR服务端"
 
-msgid "UDP Tunnel"
-msgstr "UDP 隧道"
+msgid "DNS Tunnel"
+msgstr "DNS 隧道"
 
 msgid "IPK Version"
 msgstr "IPK 版本号"
@@ -194,7 +194,7 @@ msgid "KcpTun Version"
 msgstr "KcpTun 版本号"
 
 msgid "Not exist"
-msgstr "不存在"
+msgstr "未安装可执行文件"
 
 msgid "IPK Installation Time"
 msgstr "IPK 安装时间"
@@ -210,3 +210,12 @@ msgstr "运行中"
 
 msgid "Enable GFW mode"
 msgstr "启用 GFW 模式"
+
+msgid "Operating mode"
+msgstr "运行模式"
+
+msgid "IP Route Mode"
+msgstr "IP路由模式"
+
+msgid "GFW List Mode"
+msgstr "GFW列表模式"

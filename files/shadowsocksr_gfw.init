@@ -23,7 +23,7 @@ tunnel_enable=0
 local_enable=0
 kcp_enable_flag=0
 gfw_enable=0
-gfw_enable_flag=0
+dns_enable_flag=0
 
 
 uci_get_by_name() {
@@ -129,17 +129,49 @@ start_rules() {
 		local udp_local_port=$(uci_get_by_name $UDP_RELAY_SERVER local_port)
 	fi
 	
-	if [ "$gfw_enable" = "1" ]; then
-	ipset -N gfwlist iphash
-  iptables -t nat -A PREROUTING -p tcp -m set --match-set gfwlist dst -j REDIRECT --to-port $local_port
-  return 0
-	fi
-	
 	if [ -n "$lan_ac_ips" ]; then
 		case "$lan_ac_mode" in
 			w|W|b|B) local ac_ips="$lan_ac_mode$lan_ac_ips";;
 		esac
 	fi
+	
+	if [ "$gfw_enable" = "gfw" ]; then
+	ipset -N gfwlist iphash 2>/dev/null
+	
+	local WAN_FW_IP=$(uci_get_by_type access_control wan_fw_ips) 
+	for ip in $WAN_FW_IP; do ipset add gfwlist  $ip ; done
+	
+	local MATCH_SET=""
+	if [ -n "$ac_ips" ]; then
+		case "${ac_ips:0:1}" in
+			w|W)
+				MATCH_SET="-m set ! --match-set ss_spec_lan_ac src"
+				;;
+			b|B)
+				MATCH_SET="-m set --match-set ss_spec_lan_ac src"
+				;;
+			*)
+     MATCH_SET=""
+				;;
+		esac
+	fi
+	if [ "$MATCH_SET" != "" ] ;then
+	ipset -! -R <<-EOF || MATCH_SET=""
+		create ss_spec_lan_ac hash:net
+		$(for ip in ${ac_ips:1}; do echo "add ss_spec_lan_ac $ip"; done)
+EOF
+fi
+	
+	iptables -t nat -N SSR-GFW-RULE
+	if [ "$MATCH_SET" != "" ] ;then
+	iptables -t nat -A SSR-GFW-RULE -p tcp  $MATCH_SET -j RETURN
+	fi
+  iptables -t nat -A SSR-GFW-RULE -p tcp -m set --match-set gfwlist dst  -j REDIRECT --to-port $local_port
+  iptables -t nat -I PREROUTING  -j SSR-GFW-RULE
+  return 0
+	fi
+	
+
 	/usr/bin/ssr-rules \
 		-s "$server" \
 		-l "$local_port" \
@@ -149,7 +181,6 @@ start_rules() {
 		-i "$(uci_get_by_type access_control wan_bp_list)" \
 		-b "$(uci_get_by_type access_control wan_bp_ips)" \
 		-w "$(uci_get_by_type access_control wan_fw_ips)" \
-		-e "$(uci_get_by_type access_control ipt_ext)" \
 		-o $ARG_UDP
 			
 	return $?
@@ -186,10 +217,10 @@ start_redir() {
 		-f $pid_file
 	
 	
-	if [ "$gfw_enable" = "1" ]; then
-  service_start /usr/bin/ssr-tunnel -c $CONFIG_FILE -b 0.0.0.0 -u -l 5353 -L $(uci_get_by_type global tunnel_forward 8.8.4.4:53) -f /var/run/ssr-gfw.pid
-  gfw_enable_flag=1
-	fi
+	#always on,deal with dns
+  service_start /usr/bin/ssr-tunnel -c $CONFIG_FILE -b 0.0.0.0 -u -l 5353 -L $(uci_get_by_type global tunnel_forward 8.8.4.4:53) -f /var/run/ssr-dns.pid
+  dns_enable_flag=1
+	
 	
 	return $?
 }
@@ -253,10 +284,10 @@ start_tunnel() {
 }
 
 start_local() {
-  local local_server=$(uci_get_by_type socks5_proxy server)
-  [ "$local_server" = "nil" ] && return 1
-  mkdir -p /var/run /var/etc
-  gen_config_file $local_server 2
+	local local_server=$(uci_get_by_type socks5_proxy server)
+	[ "$local_server" = "nil" ] && return 1
+	mkdir -p /var/run /var/etc
+	gen_config_file $local_server 2
 	/usr/bin/ssr-local -c $CONFIG_SOCK5_FILE -u  \
 		-l $(uci_get_by_type socks5_proxy local_port 1080) \
 		-f /var/run/ssr-local.pid
@@ -277,11 +308,11 @@ rules() {
 }
 
 start() {
-  gfw_enable=$(uci_get_by_type global gfw_enable)	
+	gfw_enable=$(uci_get_by_type global gfw_enable)	
 	if rules ;then
 	start_redir
 	
-	if [ "$gfw_enable" != "1" ] ;then
+	if [ "$gfw_enable" != "gfw" ] ;then
 	case "$(uci_get_by_type global tunnel_enable)" in
 		1|on|true|yes|enabled) start_tunnel;;
 	esac
@@ -291,11 +322,11 @@ start() {
 	start_server	
 	start_local
 	if [ $(uci_get_by_type global monitor_enable) = 1 ] ;then
-	let total_count=server_count+redir_tcp+redir_udp+tunnel_enable+kcp_enable_flag+local_enable+gfw_enable_flag
+	let total_count=server_count+redir_tcp+redir_udp+tunnel_enable+kcp_enable_flag+local_enable+dns_enable_flag
 	if [ $total_count -gt 0 ]
 	then
 	#param:server(count) redir_tcp(0:no,1:yes)  redir_udp tunnel kcp local gfw
-	service_start /usr/bin/ssr-monitor $server_count $redir_tcp $redir_udp $tunnel_enable $kcp_enable_flag $local_enable $gfw_enable_flag
+	service_start /usr/bin/ssr-monitor $server_count $redir_tcp $redir_udp $tunnel_enable $kcp_enable_flag $local_enable $dns_enable_flag
 	fi
 	fi
 	
@@ -307,7 +338,16 @@ stop() {
 	if [ $srulecount -gt 0 ] ;then
 	iptables -F SSR-SERVER-RULE
 	iptables -t filter -D INPUT  -j SSR-SERVER-RULE
-	iptables -X SSR-SERVER-RULE
+	iptables -X SSR-SERVER-RULE 2>/dev/null
+	fi
+	
+	srulecount=`iptables -t nat -L|grep SSR-GFW-RULE|wc -l`
+	if [ $srulecount -gt 0 ] ;then
+	iptables -t nat -F SSR-GFW-RULE
+	iptables -t nat -D PREROUTING  -j SSR-GFW-RULE
+	iptables -t nat -X SSR-GFW-RULE
+	ipset -X gfwlist 2>/dev/null
+	ipset -X ss_spec_lan_ac 2>/dev/null
 	fi
 	
 	killall -q -9 ssr-monitor

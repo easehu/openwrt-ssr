@@ -1,6 +1,6 @@
 #
-# Copyright (C) 2016 OpenWrt-ssr
-# Copyright (C) 2016 yushi studio <ywb94@qq.com>
+# Copyright (C) 2017 OpenWrt-ssr
+# Copyright (C) 2017 yushi studio <ywb94@qq.com>
 #
 # This is free software, licensed under the GNU General Public License v3.
 # See /LICENSE for more information.
@@ -9,7 +9,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=openwrt-ssr
-PKG_VERSION:=1.1.5
+PKG_VERSION:=1.1.6
 #PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
@@ -45,10 +45,10 @@ define Package/openwrt-ssr/Default
 endef
 
 
-Package/luci-app-shadowsocksR = $(call Package/openwrt-ssr/Default,openssl,(OpenSSL),+libopenssl +libpthread +ipset +ip +iptables-mod-tproxy +libpcre)
-Package/luci-app-shadowsocksR-Client = $(call Package/openwrt-ssr/Default,openssl,(OpenSSL),+libopenssl +libpthread +ipset +ip +iptables-mod-tproxy +libpcre)
-Package/luci-app-shadowsocksR-Server = $(call Package/openwrt-ssr/Default,openssl,(OpenSSL),+libopenssl +libpthread +ipset +ip +iptables-mod-tproxy +libpcre)
-Package/luci-app-shadowsocksR-GFW = $(call Package/openwrt-ssr/Default,openssl,(OpenSSL),+libopenssl +libpthread +ipset +ip +iptables-mod-tproxy +libpcre +dnsmasq-full)
+Package/luci-app-shadowsocksR = $(call Package/openwrt-ssr/Default,openssl,(OpenSSL),+libopenssl +libpthread +ipset +ip +iptables-mod-tproxy +libpcre +zlib)
+Package/luci-app-shadowsocksR-Client = $(call Package/openwrt-ssr/Default,openssl,(OpenSSL),+libopenssl +libpthread +ipset +ip +iptables-mod-tproxy +libpcre +zlib)
+Package/luci-app-shadowsocksR-Server = $(call Package/openwrt-ssr/Default,openssl,(OpenSSL),+libopenssl +libpthread +ipset +ip +iptables-mod-tproxy +libpcre +zlib)
+Package/luci-app-shadowsocksR-GFW = $(call Package/openwrt-ssr/Default,openssl,(OpenSSL),+libopenssl +libpthread +ipset +ip +iptables-mod-tproxy +libpcre +dnsmasq-full +zlib)
 
 define Package/openwrt-ssr/description
 	LuCI Support for $(1).
@@ -219,16 +219,19 @@ define Package/luci-app-shadowsocksR-GFW/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/ss-server $(1)/usr/bin/ssr-server		
 	$(INSTALL_BIN) ./files/shadowsocksr.rule $(1)/usr/bin/ssr-rules
 	$(INSTALL_BIN) ./files/shadowsocksr_gfw.monitor $(1)/usr/bin/ssr-monitor
-	$(INSTALL_DIR) $(1)/etc/dnsmasq.d
-	$(INSTALL_DATA) ./files/gfw_list.conf $(1)/etc/dnsmasq.d/gfw_list.conf
+	$(INSTALL_BIN) ./files/shadowsocksr.ip $(1)/usr/bin/get_chinaip
+	$(INSTALL_DIR) $(1)/etc/dnsmasq.ssr
+	$(INSTALL_DATA) ./files/gfw_list.conf $(1)/etc/dnsmasq.ssr/gfw_list.conf
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_DATA) ./files/shadowsocksr_gfw.config $(1)/etc/config/shadowsocksr
-	$(INSTALL_DATA) ./files/dnsmasq.conf $(1)/etc/dnsmasq.conf
+	$(INSTALL_DIR) $(1)/etc
+	$(INSTALL_DATA) ./files/china_ssr.txt $(1)/etc/china_ssr.txt	
+	$(INSTALL_CONF) ./files/dnsmasq.conf $(1)/etc/dnsmasq.conf
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/shadowsocksr_gfw.init $(1)/etc/init.d/shadowsocksr
 endef
 
 $(eval $(call BuildPackage,luci-app-shadowsocksR))
-$(eval $(call BuildPackage,luci-app-shadowsocksR-Client))
-$(eval $(call BuildPackage,luci-app-shadowsocksR-Server))
+#$(eval $(call BuildPackage,luci-app-shadowsocksR-Client))
+#$(eval $(call BuildPackage,luci-app-shadowsocksR-Server))
 $(eval $(call BuildPackage,luci-app-shadowsocksR-GFW))
