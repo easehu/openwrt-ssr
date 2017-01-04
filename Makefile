@@ -48,6 +48,7 @@ endef
 Package/luci-app-shadowsocksR = $(call Package/openwrt-ssr/Default,openssl,(OpenSSL),+libopenssl +libpthread +ipset +ip +iptables-mod-tproxy +libpcre)
 Package/luci-app-shadowsocksR-Client = $(call Package/openwrt-ssr/Default,openssl,(OpenSSL),+libopenssl +libpthread +ipset +ip +iptables-mod-tproxy +libpcre)
 Package/luci-app-shadowsocksR-Server = $(call Package/openwrt-ssr/Default,openssl,(OpenSSL),+libopenssl +libpthread +ipset +ip +iptables-mod-tproxy +libpcre)
+Package/luci-app-shadowsocksR-GFW = $(call Package/openwrt-ssr/Default,openssl,(OpenSSL),+libopenssl +libpthread +ipset +ip +iptables-mod-tproxy +libpcre +dnsmasq-full)
 
 define Package/openwrt-ssr/description
 	LuCI Support for $(1).
@@ -56,6 +57,7 @@ endef
 Package/luci-app-shadowsocksR/description = $(call Package/openwrt-ssr/description,shadowsocksr-libev Client and Server)
 Package/luci-app-shadowsocksR-Client/description = $(call Package/openwrt-ssr/description,shadowsocksr-libev Client)
 Package/luci-app-shadowsocksR-Server/description = $(call Package/openwrt-ssr/description,shadowsocksr-libev Server)
+Package/luci-app-shadowsocksR-GFW/description = $(call Package/openwrt-ssr/description,shadowsocksr-libev GFW)
 
 define Package/openwrt-ssr/prerm
 #!/bin/sh
@@ -75,12 +77,16 @@ endef
 
 Package/luci-app-shadowsocksR/prerm = $(call Package/openwrt-ssr/prerm,shadowsocksr)
 Package/luci-app-shadowsocksR-Client/prerm = $(call Package/openwrt-ssr/prerm,shadowsocksr)
+Package/luci-app-shadowsocksR-GFW/prerm = $(call Package/openwrt-ssr/prerm,shadowsocksr)
 
 define Package/luci-app-shadowsocksR-Server/prerm
 #!/bin/sh
+if [ -z "$${IPKG_INSTROOT}" ]; then
  /etc/init.d/shadowsocksr disable
  /etc/init.d/shadowsocksr stop
+fi 
 exit 0
+
 endef
 
 define Package/openwrt-ssr/postinst
@@ -108,6 +114,7 @@ endef
 
 Package/luci-app-shadowsocksR/postinst = $(call Package/openwrt-ssr/postinst,shadowsocksr)
 Package/luci-app-shadowsocksR-Client/postinst = $(call Package/openwrt-ssr/postinst,shadowsocksr)
+Package/luci-app-shadowsocksR-GFW/postinst = $(call Package/openwrt-ssr/postinst,shadowsocksr)
 
 define Package/luci-app-shadowsocksR-Server/postinst
 #!/bin/sh
@@ -195,6 +202,33 @@ define Package/luci-app-shadowsocksR-Server/install
 	$(INSTALL_BIN) ./files/shadowsocksr.init $(1)/etc/init.d/shadowsocksr
 endef
 
+define Package/luci-app-shadowsocksR-GFW/install
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
+	$(INSTALL_DATA) ./files/luci/controller/shadowsocksr.lua $(1)/usr/lib/lua/luci/controller/shadowsocksr.lua
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
+	$(INSTALL_DATA) ./files/luci/i18n/shadowsocksr.*.lmo $(1)/usr/lib/lua/luci/i18n
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi/shadowsocksr
+	$(INSTALL_DATA) ./files/luci/model/cbi/shadowsocksr/*.lua $(1)/usr/lib/lua/luci/model/cbi/shadowsocksr/
+	$(INSTALL_DATA) ./files/luci/model/cbi/shadowsocksr/client_gfw.lua $(1)/usr/lib/lua/luci/model/cbi/shadowsocksr/client.lua
+	$(INSTALL_DIR) $(1)/etc/uci-defaults
+	$(INSTALL_BIN) ./files/root/etc/uci-defaults/luci-shadowsocksr $(1)/etc/uci-defaults/luci-shadowsocksr
+	$(INSTALL_DIR) $(1)/usr/bin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/ss-redir $(1)/usr/bin/ssr-redir
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/ss-tunnel $(1)/usr/bin/ssr-tunnel
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/ss-local $(1)/usr/bin/ssr-local	
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/ss-server $(1)/usr/bin/ssr-server		
+	$(INSTALL_BIN) ./files/shadowsocksr.rule $(1)/usr/bin/ssr-rules
+	$(INSTALL_BIN) ./files/shadowsocksr_gfw.monitor $(1)/usr/bin/ssr-monitor
+	$(INSTALL_DIR) $(1)/etc/dnsmasq.d
+	$(INSTALL_DATA) ./files/gfw_list.conf $(1)/etc/dnsmasq.d/gfw_list.conf
+	$(INSTALL_DIR) $(1)/etc/config
+	$(INSTALL_DATA) ./files/shadowsocksr_gfw.config $(1)/etc/config/shadowsocksr
+	$(INSTALL_DATA) ./files/dnsmasq.conf $(1)/etc/dnsmasq.conf
+	$(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_BIN) ./files/shadowsocksr_gfw.init $(1)/etc/init.d/shadowsocksr
+endef
+
 $(eval $(call BuildPackage,luci-app-shadowsocksR))
 $(eval $(call BuildPackage,luci-app-shadowsocksR-Client))
 $(eval $(call BuildPackage,luci-app-shadowsocksR-Server))
+$(eval $(call BuildPackage,luci-app-shadowsocksR-GFW))

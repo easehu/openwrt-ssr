@@ -32,7 +32,7 @@ ShadowsocksR-libev for OpenWrt
 
  - 从 OpenWrt 的 [SDK][S] 编译（编译环境：Ubuntu 64位系统），如果是第一次编译，还需下载OpenWrt所需依赖软件
    ```bash
-   sudo apt-get install build-essential asciidoc binutils bzip2 gawk gettext  git libncurses5-dev libz-dev patch unzip zlib1g-dev  subversion git ccache
+   sudo apt-get install gawk libncurses5-dev libz-dev zlib1g-dev  git ccache
    ```
  
  - 下载路由器对应平台的SDK
