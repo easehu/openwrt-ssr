@@ -14,11 +14,11 @@ ShadowsocksR-libev for OpenWrt
 
 软件包包含 [shadowsocksr-libev][1] 的可执行文件,以及luci控制界面  
 
-支持SSR客户端、服务端模式（服务端支持部分混淆模式、支持多端口）
+支持SSR客户端、服务端模式（服务端支持部分混淆模式、支持多端口）；支持SOCK5代理
 
 支持两种运行模式：IP路由模式和GFW列表模式（GFWList）
 
-可以和[Shadowsocks][5]共存，在openwrt可以通过luci界面切换使用[Shadowsocks][6]或ShadowsocksR
+可以和[Shadowsocks][5]共存，在openwrt上可以通过luci界面切换使用[Shadowsocks][6]或ShadowsocksR
 
 集成[KcpTun加速][4]，此功能对路由器性能要求较高，需下载对应的二进制文件到路由器指定目录，请酌情使用
 
@@ -30,7 +30,7 @@ ShadowsocksR-libev for OpenWrt
 ---
 【IP路由模式】
  - 所有国内IP网段不走代理，国外IP网段走代理；
- - 白名单模式，缺省都走代理，列表中网站不走代理
+ - 白名单模式：缺省都走代理，列表中IP网段不走代理
 
 优点：国内外分流清晰明确；适合线路好SSR服务器，通过代理可提高访问国外网站的速度；
 
@@ -38,9 +38,9 @@ ShadowsocksR-libev for OpenWrt
 
 【GFW列表模式】
  - 只有在GFW列表中的网站走代理；其他都不走代理；
- - 黑名单模式；缺省都不走代理，列表中网站走代理
+ - 黑名单模式：缺省都不走代理，列表中网站走代理
 
-优点：只有访问列表中网站才会损耗SSR服务器流量
+优点：目标明确，只有访问列表中网站才会损耗SSR服务器流量
 
 缺点：GFW列表并不能100%涵盖被墙站点，而且有些国外站点直连速度远不如走代理 
 
@@ -67,6 +67,7 @@ ShadowsocksR-libev for OpenWrt
    # 选择要编译的包 
    #luci ->3. Applications-> luci-app-shadowsocksR         原始版本
    #luci ->3. Applications-> luci-app-shadowsocksR-GFW     GFWList版本
+   #V1.1.6以后版本取消发布单独的客户端和服务端，如有需要，请修改makefile或采用V1.1.5版本
    make menuconfig
    
    #如果没有安装po2lmo，则安装（可选）
@@ -86,13 +87,13 @@ ShadowsocksR-libev for OpenWrt
 
 软件编译后可生成两个软件包，分别是luci-app-shadowsocksR（原始版本）、luci-app-shadowsocksR-GFW（GFW版本），用户根据需要选择其中一个安装即可
 
-原始版本只支持IP路由模式，对现有OpenWRT系统改动较少，可和其他DNS处理软件一起使用；本地dns域名解析存在污染，由远端SSR服务器重新进行二次DNS解析；
+原始版本只支持IP路由模式，对现有OpenWRT系统改动较少；本地dns域名解析存在污染，由远端SSR服务器重新进行二次DNS解析；可和其他DNS处理软件一起使用；
 
-GFW版本支持IP路由模式和GFW列表模式，需卸载原有的dnsmasq，接管OpenWRT的域名处理，避免域名污染并实现准确分流；SSR服务器需开启UDP转发；
+GFW版本支持IP路由模式和GFW列表模式，需卸载原有的dnsmasq，会接管OpenWRT的域名处理，避免域名污染并实现准确分流；SSR服务器侧需开启UDP转发；
 
-提醒：如果安装GFW版本，请停用当前针对域名污染的处理软件，不要占用UDP 5353端口，并做好必要的数据备份，如/etc/dnsmasq.conf文件，安装过程会覆盖此文件
+提醒：如果安装GFW版本，请停用当前针对域名污染的其他处理软件，不要占用UDP 5353端口，并做好必要的数据备份，比如/etc/dnsmasq.conf文件，安装过程会覆盖此文件
 
-先将编译成功的luci-app-shadowsocksR*_all.ipk通过winscp上传到路由器的/tmp目录，执行命令：
+将编译成功的luci-app-shadowsocksR*_all.ipk通过winscp上传到路由器的/tmp目录，执行命令：
 
    ```bash
    #刷新opkg列表
@@ -106,12 +107,12 @@ GFW版本支持IP路由模式和GFW列表模式，需卸载原有的dnsmasq，�
    ```
 如要启用KcpTun，需从本项目releases页面或相关网站（[网站1][4]、[网站2][7]）下载路由器平台对应的二进制文件，并将文件名改为ssr-kcptun，放入/usr/bin目录
 
-安装后强烈建议重启路由器，因为luci有缓存机制，在升级或新装IPK后，如不重启有时会出现一些莫名其妙的问题
+安装后强烈建议重启路由器，因为luci有缓存机制，在升级或新装IPK后，如不重启有时会出现一些莫名其妙的问题；另GFW版本会安装、修改、调用dnsmasq-full，安装后最好能重启路由器
 
 配置
 ---
 
-   软件包通过luci配置， 支持的键如下:  
+   软件包通过luci配置， 支持的配置项如下:  
    
    客户端服务器配置：
 
@@ -153,7 +154,7 @@ GFW版本支持IP路由模式和GFW列表模式，需卸载原有的dnsmasq，�
    内网主机列表                | 内网IP列表，可以指定多个
    
    
-   服务端：
+   服务端配置：
 
    键名           | 数据类型   | 说明
    ---------------|------------|-----------------------------------------------
@@ -168,13 +169,13 @@ GFW版本支持IP路由模式和GFW列表模式，需卸载原有的dnsmasq，�
    obfs_param     | 字符串     | 混淆插件参数 [详情参考][3]
    fast_open      | 布尔型     | TCP快速打开 [详情参考][3]
    
-   某些openwrt上的kcptun在启用压缩后存在问题，因此在界面上缺省加上了“--nocomp”参数，缺省为非压缩，请在服务端也使用非压缩模式
+   在某些openwrt上的kcptun启用压缩后存在问题，因此在界面上加上了“--nocomp”参数，缺省为非压缩，请在服务端也使用非压缩模式
    
    如要打开kcptun的日志，可以在kcptun参数栏填入"--nocomp --log /var/log/kcptun.log"，日志会保存在指定文件中
    
    IP路由模式的数据文件为/etc/china_ssr.txt,包含国内所有IP网段，一般无需更新，如要更新，在openwrt上执行"get_chinaip"命令即可，注意：如果刷新必须等待命令运行完成，否则可能损坏数据库
    
-   FGW列表模式的数据文件为/etc/dnsmasq.ssr/gfw_list.conf,包含所有被墙网站，如需更新，请自行寻找替换此文件
+   FGW列表模式的数据文件为/etc/dnsmasq.ssr/gfw_list.conf，包含所有被墙网站，如需更新，请自行寻找替换此文件
    
 
 
@@ -185,10 +186,13 @@ GFW版本支持IP路由模式和GFW列表模式，需卸载原有的dnsmasq，�
 截图  
 ---
 客户端：
-![luci000](http://iytc.net/img/ssr7.jpg)
+![luci000](http://iytc.net/img/ssr8.jpg)
 
 服务端：
-![luci000](http://iytc.net/img/ssr62.jpg)
+![luci000](http://iytc.net/img/ssr82.jpg)
+
+状态页面：
+![luci000](http://iytc.net/img/ssr83.jpg)
 
   [1]: https://github.com/breakwa11/shadowsocks-libev
   [2]: https://github.com/shadowsocks/luci-app-shadowsocks/wiki/Encrypt-method
