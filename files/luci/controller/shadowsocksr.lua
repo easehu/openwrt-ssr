@@ -1,4 +1,4 @@
--- Copyright (C) 2016 yushi studio <ywb94@qq.com>
+-- Copyright (C) 2017 yushi studio <ywb94@qq.com>
 -- Licensed to the public under the GNU General Public License v3.
 
 module("luci.controller.shadowsocksr", package.seeall)
@@ -25,7 +25,7 @@ function index()
 	end
 		
 
-	entry({"admin", "services", "shadowsocksr", "about"},cbi("shadowsocksr/status"),_("Status"), 30).leaf = true
+	entry({"admin", "services", "shadowsocksr", "status"},cbi("shadowsocksr/status"),_("Status"), 30).leaf = true
 	
 
 	
