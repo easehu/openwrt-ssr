@@ -80,13 +80,17 @@ ShadowsocksR-libev for OpenWrt
    # 开始编译
    make V=99
    ```
- - 如果你使用LEDE的SDK编译，可能会提示找不到zlib和openssl文件，请运行如下命令安装
+ - LEDE编译补充
+   LEDE是OpenWRT的另一个版本，LEDE的SDK采用xz压缩，需先用xz -d解压下载的SDK包，在按上述命令操作
+   
+   使用LEDE的SDK编译，可能会提示找不到zlib和openssl文件，请运行如下命令安装
  
    ```bash
    ./scripts/feeds update
    ./scripts/feeds install zlib
    ./scripts/feeds install libopenssl
    ```
+   
    
 安装
 --- 
