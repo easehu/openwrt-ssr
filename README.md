@@ -81,9 +81,10 @@ ShadowsocksR-libev for OpenWrt
    make V=99
    ```
  - LEDE编译补充
-   LEDE是OpenWRT的另一个版本，LEDE的SDK采用xz压缩，需先用xz -d解压下载的SDK包，在按上述命令操作
+ 
+   LEDE是OpenWRT的另一个版本，LEDE的SDK采用xz压缩，需先用xz -d解压下载的SDK包，再按上述命令操作
    
-   使用LEDE的SDK编译，可能会提示找不到zlib和openssl文件，请运行如下命令安装
+   使用LEDE的SDK编译，可能会提示找不到zlib和openssl文件，请运行如下命令
  
    ```bash
    ./scripts/feeds update
