@@ -9,7 +9,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=openwrt-ssr
-PKG_VERSION:=1.1.6
+PKG_VERSION:=1.1.7
 #PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
@@ -209,7 +209,6 @@ define Package/luci-app-shadowsocksR-GFW/install
 	$(INSTALL_DATA) ./files/luci/i18n/shadowsocksr.*.lmo $(1)/usr/lib/lua/luci/i18n
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi/shadowsocksr
 	$(INSTALL_DATA) ./files/luci/model/cbi/shadowsocksr/*.lua $(1)/usr/lib/lua/luci/model/cbi/shadowsocksr/
-	$(INSTALL_DATA) ./files/luci/model/cbi/shadowsocksr/client_gfw.lua $(1)/usr/lib/lua/luci/model/cbi/shadowsocksr/client.lua
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_BIN) ./files/root/etc/uci-defaults/luci-shadowsocksr $(1)/etc/uci-defaults/luci-shadowsocksr
 	$(INSTALL_DIR) $(1)/usr/bin
@@ -218,17 +217,17 @@ define Package/luci-app-shadowsocksR-GFW/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/ss-local $(1)/usr/bin/ssr-local	
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/ss-server $(1)/usr/bin/ssr-server		
 	$(INSTALL_BIN) ./files/shadowsocksr.rule $(1)/usr/bin/ssr-rules
-	$(INSTALL_BIN) ./files/shadowsocksr_gfw.monitor $(1)/usr/bin/ssr-monitor
+	$(INSTALL_BIN) ./files/shadowsocksr.monitor $(1)/usr/bin/ssr-monitor
 	$(INSTALL_BIN) ./files/shadowsocksr.ip $(1)/usr/bin/get_chinaip
 	$(INSTALL_DIR) $(1)/etc/dnsmasq.ssr
 	$(INSTALL_DATA) ./files/gfw_list.conf $(1)/etc/dnsmasq.ssr/gfw_list.conf
 	$(INSTALL_DIR) $(1)/etc/config
-	$(INSTALL_DATA) ./files/shadowsocksr_gfw.config $(1)/etc/config/shadowsocksr
+	$(INSTALL_DATA) ./files/shadowsocksr.config $(1)/etc/config/shadowsocksr
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DATA) ./files/china_ssr.txt $(1)/etc/china_ssr.txt	
 	$(INSTALL_CONF) ./files/dnsmasq.conf $(1)/etc/dnsmasq.conf
 	$(INSTALL_DIR) $(1)/etc/init.d
-	$(INSTALL_BIN) ./files/shadowsocksr_gfw.init $(1)/etc/init.d/shadowsocksr
+	$(INSTALL_BIN) ./files/shadowsocksr.init $(1)/etc/init.d/shadowsocksr
 endef
 
 $(eval $(call BuildPackage,luci-app-shadowsocksR))

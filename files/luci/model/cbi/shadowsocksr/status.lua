@@ -1,9 +1,10 @@
 -- Copyright (C) 2017 yushi studio <ywb94@qq.com>
 -- Licensed to the public under the GNU General Public License v3.
 
-local IPK_Version="1.1.6"
+local IPK_Version="1.1.7"
 local m, s, o
 local redir_run=0
+local reudp_run=0
 local sock5_run=0
 local server_run=0
 local kcptun_run=0
@@ -30,6 +31,16 @@ else
      kcptun_version = translate("Unknown")
  end
         
+end
+
+local icount=sys.exec("ps -w | grep ssr-reudp |grep -v grep| wc -l")
+if tonumber(icount)>0 then
+reudp_run=1
+else
+icount=sys.exec("ps -w | grep ssr-retcp |grep \"\\-u\"|grep -v grep| wc -l")
+if tonumber(icount)>0 then
+reudp_run=1
+end
 end
 
 
@@ -69,6 +80,14 @@ end
 s=m:field(DummyValue,"server_run",translate("Global SSR Server")) 
 s.rawhtml  = true
 if server_run == 1 then
+s.value =font_blue .. bold_on .. translate("Running") .. bold_off .. font_off
+else
+s.value = translate("Not Running")
+end
+
+s=m:field(DummyValue,"reudp_run",translate("UDP Relay")) 
+s.rawhtml  = true
+if reudp_run == 1 then
 s.value =font_blue .. bold_on .. translate("Running") .. bold_off .. font_off
 else
 s.value = translate("Not Running")

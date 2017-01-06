@@ -103,7 +103,7 @@ ShadowsocksR-libev for OpenWrt
 
 GFW版本支持IP路由模式和GFW列表模式，需卸载原有的dnsmasq，会接管OpenWRT的域名处理，避免域名污染并实现准确分流；SSR服务器侧需开启UDP转发；
 
-提醒：如果安装GFW版本，请停用当前针对域名污染的其他处理软件，不要占用UDP 5353端口，并做好必要的数据备份，比如/etc/dnsmasq.conf文件，安装过程会覆盖此文件
+提醒：如果安装GFW版本，请停用当前针对域名污染的其他处理软件，不要占用UDP 5353端口，并做好必要的数据备份，比如/etc/dnsmasq.conf文件，安装过程会覆盖此文件，如提示文件冲突，请先将此文件改名后再安装
 
 将编译成功的luci-app-shadowsocksR*_all.ipk通过winscp上传到路由器的/tmp目录，执行命令：
 

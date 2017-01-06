@@ -155,7 +155,7 @@ msgid "Enable Process Monitor"
 msgstr "启用进程监控"
 
 msgid "Edit ShadowSocksR Server"
-msgstr "编辑服务器配置
+msgstr "编辑服务器配置"
 
 msgid "Alias"
 msgstr "别名"
@@ -219,3 +219,18 @@ msgstr "IP路由模式"
 
 msgid "GFW List Mode"
 msgstr "GFW列表模式"
+
+msgid "Router Proxy"
+msgstr "路由器访问控制"
+
+msgid "Normal Proxy"
+msgstr "正常代理"
+
+msgid "Bypassed Proxy"
+msgstr "不走代理"
+
+msgid "Forwarded Proxy"
+msgstr "强制走代理"
+
+msgid "UDP Relay"
+msgstr "UDP中继"

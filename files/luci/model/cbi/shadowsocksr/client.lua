@@ -8,6 +8,11 @@ local ipkg = require("luci.model.ipkg")
 
 local sys = require "luci.sys"
 
+local gfwmode=0
+
+if nixio.fs.access("/etc/dnsmasq.ssr/gfw_list.conf") then
+gfwmode=1		
+end
 
 
 m = Map(shadowsocksr, translate("ShadowSocksR Client"))
@@ -143,6 +148,7 @@ for k, v in pairs(server_table) do o:value(k, v) end
 o = s:option(Flag, "monitor_enable", translate("Enable Process Monitor"))
 o.rmempty = false
 
+if gfwmode==0 then 
 
 o = s:option(Flag, "tunnel_enable", translate("Enable Tunnel(DNS)"))
 o.default = 0
@@ -152,6 +158,15 @@ o = s:option(Value, "tunnel_port", translate("Tunnel Port"))
 o.datatype = "port"
 o.default = 5300
 o.rmempty = false
+
+else
+
+o = s:option(ListValue, "gfw_enable", translate("Operating mode"))
+o:value("router", translate("IP Route Mode"))
+o:value("gfw", translate("GFW List Mode"))
+o.rmempty = false
+
+end
 
 o = s:option(Value, "tunnel_forward", translate("Forwarding Tunnel"))
 o.default = "8.8.4.4:53"
@@ -194,6 +209,12 @@ o.datatype = "ip4addr"
 
 -- Part of LAN
 s:tab("lan_ac", translate("Interfaces - LAN"))
+
+o = s:taboption("lan_ac",ListValue, "router_proxy", translate("Router Proxy"))
+o:value("1", translatef("Normal Proxy"))
+o:value("0", translatef("Bypassed Proxy"))
+o:value("2", translatef("Forwarded Proxy"))
+o.rmempty = false
 
 o = s:taboption("lan_ac", ListValue, "lan_ac_mode", translate("LAN Access Control"))
 o:value("0", translate("Disable"))
