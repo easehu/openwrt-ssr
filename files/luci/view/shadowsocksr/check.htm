@@ -1,0 +1,35 @@
+<%+cbi/valueheader%>
+
+<script type="text/javascript">//<![CDATA[
+
+	function check_<%=self.option%>_connect(btn)
+	{
+		btn.disabled = true;
+		btn.value    = '<%:Check...%>';
+		murl="<%=self.option%>"
+		XHR.get('<%=luci.dispatcher.build_url("admin", "services", "shadowsocksr","check")%>',
+			{ set:murl },
+			function(x,rv)
+			{
+			var s = document.getElementById('<%=self.option%>-status');
+			if (s)
+			{
+				s.innerHTML = rv.ret|| '?';
+
+
+			}
+
+				btn.disabled = false;
+				btn.value    = '<%:Check%>';
+			}
+		);
+
+		return false;
+	}
+//]]></script>
+
+<span id="<%=self.option%>-status"><em><%:No Check%></em></span>
+<input type="button" class="cbi-button cbi-button-apply" value="<%:Check%>" onclick="return check_<%=self.option%>_connect(this)" />
+
+
+<%+cbi/valuefooter%>

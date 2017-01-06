@@ -86,6 +86,35 @@ EOF
 
 
 
+gen_iplist() {
+	cat <<-EOF
+		0.0.0.0/8
+		10.0.0.0/8
+		100.64.0.0/10
+		127.0.0.0/8
+		169.254.0.0/16
+		172.16.0.0/12
+		192.0.0.0/24
+		192.0.2.0/24
+		192.88.99.0/24
+		192.168.0.0/16
+		198.18.0.0/15
+		198.51.100.0/24
+		203.0.113.0/24
+		224.0.0.0/4
+		240.0.0.0/4
+		255.255.255.255
+		$SSR_TCP_SERVER
+		$SSR_UDP_SERVER
+EOF
+}
+get_arg_out() {
+	case "$(uci_get_by_type access_control router_proxy 1)" in
+		1) echo "-o";;
+		2) echo "-O";;
+	esac
+}
+
 start_rules() {
 	local server=$(uci_get_by_name $GLOBAL_SERVER server)
 	#resolve name
@@ -121,6 +150,7 @@ start_rules() {
 	local local_port=$(uci_get_by_name $GLOBAL_SERVER local_port)
 	local lan_ac_ips=$(uci_get_by_type access_control lan_ac_ips)
 	local lan_ac_mode=$(uci_get_by_type access_control lan_ac_mode)
+	local router_proxy=$(uci_get_by_type access_control router_proxy)
 	if [ "$GLOBAL_SERVER" = "$UDP_RELAY_SERVER" -a $kcp_enable_flag = 0 ]; then
 		ARG_UDP="-u"
 	elif [ -n "$UDP_RELAY_SERVER" ]; then
@@ -135,12 +165,16 @@ start_rules() {
 		esac
 	fi
 	
+#deal	gfw firewall rule
 	if [ "$gfw_enable" = "gfw" ]; then
-	ipset -N gfwlist iphash 2>/dev/null
 	
+	ipset -N gfwlist iphash 2>/dev/null
+
+# wan rule	
 	local WAN_FW_IP=$(uci_get_by_type access_control wan_fw_ips) 
 	for ip in $WAN_FW_IP; do ipset add gfwlist  $ip ; done
 	
+# lan rule	
 	local MATCH_SET=""
 	if [ -n "$ac_ips" ]; then
 		case "${ac_ips:0:1}" in
@@ -163,11 +197,39 @@ EOF
 fi
 	
 	iptables -t nat -N SSR-GFW-RULE
+	
+# lan rule
 	if [ "$MATCH_SET" != "" ] ;then
 	iptables -t nat -A SSR-GFW-RULE -p tcp  $MATCH_SET -j RETURN
 	fi
+# gfw rule
 	iptables -t nat -A SSR-GFW-RULE -p tcp -m set --match-set gfwlist dst  -j REDIRECT --to-port $local_port
 	iptables -t nat -I PREROUTING  -j SSR-GFW-RULE
+#route rule	
+  #normal
+	if [ "$router_proxy" = "1" ] ;then
+	iptables -t nat -N SSR_ROUTE_OUT
+	iptables -t nat -A SSR_ROUTE_OUT -p tcp -j SSR-GFW-RULE
+	iptables -t nat -I OUTPUT -j SSR_ROUTE_OUT
+	#forwarded
+	elif [ "$router_proxy" = "2" ] ;then
+	SSR_TCP_SERVER=$server
+	if [ "$ARG_UDP" = "-U" ] ;then
+	SSR_UDP_SERVER=$udp_server
+	else
+	SSR_UDP_SERVER=""
+	fi
+		ipset -! -R <<-EOF || return 1
+		create ssr_spec_dst hash:net
+		$(gen_iplist | sed -e "s/^/add ssr_spec_dst /")
+EOF
+	iptables -t nat -N SSR_ROUTE_OUT
+	iptables -t nat -A SSR_ROUTE_OUT -m set --match-set ssr_spec_dst dst -j RETURN
+	iptables -t nat -A SSR_ROUTE_OUT -p tcp -j REDIRECT --to-port $local_port
+	iptables -t nat -I OUTPUT -j SSR_ROUTE_OUT
+	
+	fi
+	
   return 0
 	fi
 	
@@ -181,7 +243,7 @@ fi
 		-i "$(uci_get_by_type access_control wan_bp_list)" \
 		-b "$(uci_get_by_type access_control wan_bp_ips)" \
 		-w "$(uci_get_by_type access_control wan_fw_ips)" \
-		-o $ARG_UDP
+		$(get_arg_out) $ARG_UDP
 			
 	return $?
 }
@@ -348,6 +410,14 @@ stop() {
 	iptables -t nat -X SSR-GFW-RULE
 	ipset -X gfwlist 2>/dev/null
 	ipset -X ss_spec_lan_ac 2>/dev/null
+	fi
+	
+	srulecount=`iptables -t nat -L|grep SSR_ROUTE_OUT|wc -l`
+	if [ $srulecount -gt 0 ] ;then
+	iptables -t nat -F SSR_ROUTE_OUT
+	iptables -t nat -D OUTPUT -j SSR_ROUTE_OUT
+	iptables -t nat -X SSR_ROUTE_OUT
+	ipset -X ssr_spec_dst 2>/dev/null
 	fi
 	
 	killall -q -9 ssr-monitor

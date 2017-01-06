@@ -123,7 +123,11 @@ s=m:field(DummyValue,"version",translate("IPK Version"))
 s.rawhtml  = true
 s.value =IPK_Version
 
+s=m:field(DummyValue,"google",translate("Google Connectivity")) 
+s.template = "shadowsocksr/check"
 
+s=m:field(DummyValue,"baidu",translate("Baidu Connectivity")) 
+s.template = "shadowsocksr/check"
 
 
 s=m:field(DummyValue,"kcp_version",translate("KcpTun Version")) 

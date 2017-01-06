@@ -234,3 +234,21 @@ msgstr "强制走代理"
 
 msgid "UDP Relay"
 msgstr "UDP中继"
+
+msgid "Google Connectivity"
+msgstr "Google 连通性"
+
+msgid "Baidu Connectivity"
+msgstr "百度连通性"
+
+msgid "No Check"
+msgstr "未检查"
+
+msgid "Check"
+msgstr "检查"
+
+msgid "Connect OK"
+msgstr "连接正常"
+
+msgid "Connect Error"
+msgstr "连接错误"

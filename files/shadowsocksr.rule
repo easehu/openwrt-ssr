@@ -28,6 +28,7 @@ usage() {
 		    -w <wan_ips>            wan ip of will be forwarded
 		    -e <extra_options>      extra options for iptables
 		    -o                      apply the rules to the OUTPUT chain
+		    -O                      apply the global rules to the OUTPUT chain
 		    -u                      enable udprelay mode, TPROXY is required
 		    -U                      enable udprelay mode, using different IP
 		                            and ports for TCP and UDP
@@ -57,6 +58,7 @@ flush_r() {
 	ip route del local 0.0.0.0/0 dev lo table 100 2>/dev/null
 	ipset -X ss_spec_lan_ac 2>/dev/null
 	ipset -X ss_spec_wan_ac 2>/dev/null
+	ipset -X ssr_gen_router 2>/dev/null
 	[ -n "$FWI" ] && echo '#!/bin/sh' >$FWI
 	return 0
 }
@@ -108,6 +110,15 @@ EOF
 	if [ "$OUTPUT" = 1 ]; then
 		$IPT -I OUTPUT 1 -p tcp $EXT_ARGS \
 			-m comment --comment "$TAG" -j SS_SPEC_WAN_AC
+	elif [ "$OUTPUT" = 2 ]; then
+		ipset -! -R <<-EOF || return 1
+		create ssr_gen_router hash:net
+		$(gen_spec_iplist | sed -e "s/^/add ssr_gen_router /")
+EOF
+		$IPT -N SS_SPEC_ROUTER && \
+		$IPT -A SS_SPEC_ROUTER -m set --match-set ssr_gen_router dst -j RETURN && \
+		$IPT -A SS_SPEC_ROUTER -j SS_SPEC_WAN_FW
+		$IPT -I OUTPUT 1 -p tcp -m comment --comment "$TAG" -j SS_SPEC_ROUTER	
 	fi
 	return $?
 }
@@ -156,6 +167,28 @@ gen_iplist() {
 EOF
 }
 
+gen_spec_iplist() {
+	cat <<-EOF
+		0.0.0.0/8
+		10.0.0.0/8
+		100.64.0.0/10
+		127.0.0.0/8
+		169.254.0.0/16
+		172.16.0.0/12
+		192.0.0.0/24
+		192.0.2.0/24
+		192.88.99.0/24
+		192.168.0.0/16
+		198.18.0.0/15
+		198.51.100.0/24
+		203.0.113.0/24
+		224.0.0.0/4
+		240.0.0.0/4
+		255.255.255.255
+		$(get_wan_ip)		
+EOF
+}
+
 gen_include() {
 	[ -n "$FWI" ] || return 0
 	extract_rules() {
@@ -173,7 +206,7 @@ EOF
 	return 0
 }
 
-while getopts ":s:l:S:L:i:e:a:b:w:ouUfh" arg; do
+while getopts ":s:l:S:L:i:e:a:b:w:oOuUfh" arg; do
 	case "$arg" in
 		s)
 			server=$OPTARG
@@ -205,6 +238,9 @@ while getopts ":s:l:S:L:i:e:a:b:w:ouUfh" arg; do
 		o)
 			OUTPUT=1
 			;;
+		O)
+			OUTPUT=2
+			;;			
 		u)
 			TPROXY=1
 			;;

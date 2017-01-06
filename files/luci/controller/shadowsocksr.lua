@@ -26,8 +26,19 @@ function index()
 		
 
 	entry({"admin", "services", "shadowsocksr", "status"},cbi("shadowsocksr/status"),_("Status"), 30).leaf = true
-	
+	entry({"admin", "services", "shadowsocksr", "check"}, call("check_status"))
 
 	
-	
 end
+
+function check_status()
+local set ="wget --spider --quiet -T 3 www." .. luci.http.formvalue("set") .. ".com"
+if luci.sys.call(set) == 0 then
+retstring ="Connect OK"
+else
+retstring ="Connect Error"
+end	
+luci.http.prepare_content("application/json")
+luci.http.write_json({ ret=retstring })
+end
+

@@ -138,6 +138,8 @@ define Package/openwrt-ssr/install
 	$(INSTALL_DATA) ./files/luci/i18n/$(2).*.lmo $(1)/usr/lib/lua/luci/i18n
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi/shadowsocksr
 	$(INSTALL_DATA) ./files/luci/model/cbi/shadowsocksr/*.lua $(1)/usr/lib/lua/luci/model/cbi/shadowsocksr/
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view/shadowsocksr
+	$(INSTALL_DATA) ./files/luci/view/shadowsocksr/*.htm $(1)/usr/lib/lua/luci/view/shadowsocksr/
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_BIN) ./files/root/etc/uci-defaults/luci-$(2) $(1)/etc/uci-defaults/luci-$(2)
 	$(INSTALL_DIR) $(1)/usr/bin
@@ -165,6 +167,8 @@ define Package/luci-app-shadowsocksR-Client/install
 	$(INSTALL_DATA) ./files/luci/i18n/shadowsocksr.*.lmo $(1)/usr/lib/lua/luci/i18n
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi/shadowsocksr
 	$(INSTALL_DATA) ./files/luci/model/cbi/shadowsocksr/*.lua $(1)/usr/lib/lua/luci/model/cbi/shadowsocksr/
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view/shadowsocksr
+	$(INSTALL_DATA) ./files/luci/view/shadowsocksr/*.htm $(1)/usr/lib/lua/luci/view/shadowsocksr/
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_BIN) ./files/root/etc/uci-defaults/luci-shadowsocksr $(1)/etc/uci-defaults/luci-shadowsocksr
 	$(INSTALL_DIR) $(1)/usr/bin
@@ -189,6 +193,8 @@ define Package/luci-app-shadowsocksR-Server/install
 	$(INSTALL_DATA) ./files/luci/i18n/shadowsocksr.*.lmo $(1)/usr/lib/lua/luci/i18n
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi/shadowsocksr
 	$(INSTALL_DATA) ./files/luci/model/cbi/shadowsocksr/*.lua $(1)/usr/lib/lua/luci/model/cbi/shadowsocksr/
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view/shadowsocksr
+	$(INSTALL_DATA) ./files/luci/view/shadowsocksr/*.htm $(1)/usr/lib/lua/luci/view/shadowsocksr/
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_BIN) ./files/root/etc/uci-defaults/luci-shadowsocksr $(1)/etc/uci-defaults/luci-shadowsocksr
 	$(INSTALL_DIR) $(1)/usr/bin
@@ -209,6 +215,8 @@ define Package/luci-app-shadowsocksR-GFW/install
 	$(INSTALL_DATA) ./files/luci/i18n/shadowsocksr.*.lmo $(1)/usr/lib/lua/luci/i18n
 	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/model/cbi/shadowsocksr
 	$(INSTALL_DATA) ./files/luci/model/cbi/shadowsocksr/*.lua $(1)/usr/lib/lua/luci/model/cbi/shadowsocksr/
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view/shadowsocksr
+	$(INSTALL_DATA) ./files/luci/view/shadowsocksr/*.htm $(1)/usr/lib/lua/luci/view/shadowsocksr/
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_BIN) ./files/root/etc/uci-defaults/luci-shadowsocksr $(1)/etc/uci-defaults/luci-shadowsocksr
 	$(INSTALL_DIR) $(1)/usr/bin
