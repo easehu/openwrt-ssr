@@ -199,12 +199,15 @@ GFW版本支持IP路由模式和GFW列表模式，需卸载原有的dnsmasq，�
 截图  
 ---
 客户端：
+
 ![luci000](http://iytc.net/img/ssr8.jpg)
 
 服务端：
+
 ![luci000](http://iytc.net/img/ssr82.jpg)
 
 状态页面：
+
 ![luci000](http://iytc.net/img/ssr84.jpg)
 
   [1]: https://github.com/breakwa11/shadowsocks-libev
