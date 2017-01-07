@@ -162,6 +162,7 @@ GFW版本支持IP路由模式和GFW列表模式，需卸载原有的dnsmasq，�
    访问控制-被忽略IP列表       | IP路由模式时有效，用于指定存放国内IP网段的文件，这些网段不经过代理
    访问控制-额外被忽略IP       | IP路由模式时有效，用于添加额外的不经过代理的目的IP地址
    访问控制-强制走代理IP       | 用于添加需要经过代理的目的IP地址
+   路由器访问控制              | 用于控制路由器本身是否走代理，适用于路由器挂载BT下载的情况
    内网访问控制                | 可以控制内网中哪些IP能走代理，哪些不能走代理，可以指定下面列表内或列表外IP
    内网主机列表                | 内网IP列表，可以指定多个
    
@@ -204,7 +205,7 @@ GFW版本支持IP路由模式和GFW列表模式，需卸载原有的dnsmasq，�
 ![luci000](http://iytc.net/img/ssr82.jpg)
 
 状态页面：
-![luci000](http://iytc.net/img/ssr83.jpg)
+![luci000](http://iytc.net/img/ssr84.jpg)
 
   [1]: https://github.com/breakwa11/shadowsocks-libev
   [2]: https://github.com/shadowsocks/luci-app-shadowsocks/wiki/Encrypt-method
