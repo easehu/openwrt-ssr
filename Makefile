@@ -233,7 +233,7 @@ define Package/luci-app-shadowsocksR-GFW/install
 	$(INSTALL_DATA) ./files/shadowsocksr.config $(1)/etc/config/shadowsocksr
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DATA) ./files/china_ssr.txt $(1)/etc/china_ssr.txt	
-	$(INSTALL_CONF) ./files/dnsmasq.conf $(1)/etc/dnsmasq.conf
+	$(INSTALL_DATA) ./files/dnsmasq.conf $(1)/etc/dnsmasq.conf
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/shadowsocksr.init $(1)/etc/init.d/shadowsocksr
 endef

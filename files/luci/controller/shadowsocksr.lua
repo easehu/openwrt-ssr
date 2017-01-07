@@ -32,11 +32,11 @@ function index()
 end
 
 function check_status()
-local set ="wget --spider --quiet -T 3 www." .. luci.http.formvalue("set") .. ".com"
+local set ="wget --spider --quiet -T3 -t1 www." .. luci.http.formvalue("set") .. ".com"
 if luci.sys.call(set) == 0 then
-retstring ="Connect OK"
+retstring ="0"
 else
-retstring ="Connect Error"
+retstring ="1"
 end	
 luci.http.prepare_content("application/json")
 luci.http.write_json({ ret=retstring })

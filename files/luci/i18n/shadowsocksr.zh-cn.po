@@ -252,3 +252,6 @@ msgstr "连接正常"
 
 msgid "Connect Error"
 msgstr "连接错误"
+
+msgid "Check..."
+msgstr "正在检查.."

@@ -1,7 +1,7 @@
 #!/bin/sh
 #
-# Copyright (C) 2016 openwrt-ssr
-# Copyright (C) 2016 yushi studio <ywb94@qq.com>
+# Copyright (C) 2017 openwrt-ssr
+# Copyright (C) 2017 yushi studio <ywb94@qq.com>
 #
 # This is free software, licensed under the GNU General Public License v3.
 # See /LICENSE for more information.
@@ -33,6 +33,7 @@ usage() {
 		    -U                      enable udprelay mode, using different IP
 		                            and ports for TCP and UDP
 		    -f                      flush the rules
+		    -g                      gfw list mode
 		    -h                      show this help message and exit
 EOF
 	exit $1
@@ -59,11 +60,13 @@ flush_r() {
 	ipset -X ss_spec_lan_ac 2>/dev/null
 	ipset -X ss_spec_wan_ac 2>/dev/null
 	ipset -X ssr_gen_router 2>/dev/null
+	ipset -X gfwlist 2>/dev/null
 	[ -n "$FWI" ] && echo '#!/bin/sh' >$FWI
 	return 0
 }
 
 ipset_r() {
+	if [ -z "$GFWMODE" ] ;then
 	ipset -! -R <<-EOF || return 1
 		create ss_spec_wan_ac hash:net
 		$(gen_iplist | sed -e "s/^/add ss_spec_wan_ac /")
@@ -72,6 +75,12 @@ EOF
 	$IPT -N SS_SPEC_WAN_AC && \
 	$IPT -A SS_SPEC_WAN_AC -m set --match-set ss_spec_wan_ac dst -j RETURN && \
 	$IPT -A SS_SPEC_WAN_AC -j SS_SPEC_WAN_FW
+	else
+	ipset -N gfwlist iphash 2>/dev/null
+	for ip in $WAN_FW_IP; do ipset add gfwlist  $ip ; done
+	$IPT -N SS_SPEC_WAN_AC
+	$IPT -A SS_SPEC_WAN_AC -m set --match-set gfwlist dst -j SS_SPEC_WAN_FW
+	fi
 	return $?
 }
 
@@ -129,8 +138,13 @@ tp_rule() {
 	ip route add local 0.0.0.0/0 dev lo table 100
 	local ipt="iptables -t mangle"
 	$ipt -N SS_SPEC_TPROXY
+	if [ -z "$GFWMODE" ] ;then
 	$ipt -A SS_SPEC_TPROXY -p udp -m set ! --match-set ss_spec_wan_ac dst \
 		-j TPROXY --on-port "$LOCAL_PORT" --tproxy-mark 0x01/0x01
+	else
+	$ipt -A SS_SPEC_TPROXY -p udp -m set  --match-set gfwlist dst \
+		-j TPROXY --on-port "$LOCAL_PORT" --tproxy-mark 0x01/0x01
+	fi	
 	$ipt -I PREROUTING 1 ${IFNAME:+-i $IFNAME} -p udp $EXT_ARGS $MATCH_SET \
 		-m comment --comment "$TAG" -j SS_SPEC_TPROXY
 	return $?
@@ -206,7 +220,7 @@ EOF
 	return 0
 }
 
-while getopts ":s:l:S:L:i:e:a:b:w:oOuUfh" arg; do
+while getopts ":s:l:S:L:i:e:a:b:w:oOuUfgh" arg; do
 	case "$arg" in
 		s)
 			server=$OPTARG
@@ -247,6 +261,9 @@ while getopts ":s:l:S:L:i:e:a:b:w:oOuUfh" arg; do
 		U)
 			TPROXY=2
 			;;
+		g)
+			GFWMODE=1
+			;;			
 		f)
 			flush_r
 			exit 0
