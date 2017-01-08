@@ -108,7 +108,7 @@ start_rules() {
 	 fi
 	fi
 	
-	kcp_server=server
+	kcp_server=$server
 	
 	local kcp_enable=$(uci_get_by_name $GLOBAL_SERVER kcp_enable)
 	if [ $kcp_enable = "1" ] ;then
