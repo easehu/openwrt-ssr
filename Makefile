@@ -9,7 +9,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=openwrt-ssr
-PKG_VERSION:=1.1.7
+PKG_VERSION:=1.1.8
 #PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
@@ -88,6 +88,17 @@ fi
 exit 0
 
 endef
+
+define Package/openwrt-ssr/preinst
+#!/bin/sh
+
+if [ -f "/etc/dnsmasq.conf" ]; then
+ mv /etc/dnsmasq.conf /etc/dnsmasq_bak.conf
+fi
+exit 0
+endef
+
+Package/luci-app-shadowsocksR-GFW/preinst = $(call Package/openwrt-ssr/preinst)
 
 define Package/openwrt-ssr/postinst
 #!/bin/sh

@@ -1,7 +1,7 @@
 -- Copyright (C) 2017 yushi studio <ywb94@qq.com> github.com/ywb94
 -- Licensed to the public under the GNU General Public License v3.
 
-local m, s, o,kcp_enable
+local m, s,sec, o,kcp_enable
 local shadowsocksr = "shadowsocksr"
 local uci = luci.model.uci.cursor()
 local ipkg = require("luci.model.ipkg")
@@ -76,56 +76,53 @@ end)
 
 
 -- [[ Servers Setting ]]--
-s = m:section(TypedSection, "servers", translate("Servers Setting"))
-s.anonymous = true
-s.addremove = true
-s.sortable = true
-s.template = "cbi/tblsection"
-s.extedit = luci.dispatcher.build_url("admin/services/shadowsocksr/client/%s")
-newconfig = luci.dispatcher.build_url("admin/services/shadowsocksr/client/%s")
-function s.create(...)
+sec = m:section(TypedSection, "servers", translate("Servers Setting"))
+sec.anonymous = true
+sec.addremove = true
+sec.sortable = true
+sec.template = "cbi/tblsection"
+sec.extedit = luci.dispatcher.build_url("admin/services/shadowsocksr/client/%s")
+function sec.create(...)
 	local sid = TypedSection.create(...)
 	if sid then
-		luci.http.redirect(newconfig % sid)
+		luci.http.redirect(sec.extedit % sid)
 		return
 	end
 end
 
-o = s:option(DummyValue, "alias", translate("Alias"))
+o = sec:option(DummyValue, "alias", translate("Alias"))
 function o.cfgvalue(...)
 	return Value.cfgvalue(...) or translate("None")
 end
 
 
-o = s:option(DummyValue, "server", translate("Server Address"))
+o = sec:option(DummyValue, "server", translate("Server Address"))
 function o.cfgvalue(...)
 	return Value.cfgvalue(...) or "?"
 end
 
-o = s:option(DummyValue, "server_port", translate("Server Port"))
+o = sec:option(DummyValue, "server_port", translate("Server Port"))
+function o.cfgvalue(...)
+	return Value.cfgvalue(...) or "?"
+end
+
+o = sec:option(DummyValue, "encrypt_method", translate("Encrypt Method"))
+function o.cfgvalue(...)
+	return Value.cfgvalue(...) or "?"
+end
+
+o = sec:option(DummyValue, "protocol", translate("Protocol"))
 function o.cfgvalue(...)
 	return Value.cfgvalue(...) or "?"
 end
 
 
-
-o = s:option(DummyValue, "encrypt_method", translate("Encrypt Method"))
+o = sec:option(DummyValue, "obfs", translate("Obfs"))
 function o.cfgvalue(...)
 	return Value.cfgvalue(...) or "?"
 end
 
-o = s:option(DummyValue, "protocol", translate("Protocol"))
-function o.cfgvalue(...)
-	return Value.cfgvalue(...) or "?"
-end
-
-
-o = s:option(DummyValue, "obfs", translate("Obfs"))
-function o.cfgvalue(...)
-	return Value.cfgvalue(...) or "?"
-end
-
-o = s:option(DummyValue, "kcp_enable", translate("KcpTun Enable"))
+o = sec:option(DummyValue, "kcp_enable", translate("KcpTun Enable"))
 function o.cfgvalue(...)
 	return Value.cfgvalue(...) or "?"
 end
