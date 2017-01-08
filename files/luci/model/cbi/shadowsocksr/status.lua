@@ -9,6 +9,14 @@ local sock5_run=0
 local server_run=0
 local kcptun_run=0
 local tunnel_run=0
+local gfw_count=0
+local ip_count=0
+local gfwmode=0
+
+if nixio.fs.access("/etc/dnsmasq.ssr/gfw_list.conf") then
+gfwmode=1		
+end
+
 local shadowsocksr = "shadowsocksr"
 -- html constants
 font_blue = [[<font color="blue">]]
@@ -31,6 +39,14 @@ else
      kcptun_version = translate("Unknown")
  end
         
+end
+
+if gfwmode==1 then 
+ gfw_count = tonumber(sys.exec("cat /etc/dnsmasq.ssr/gfw_list.conf | wc -l"))/2
+end
+ 
+if nixio.fs.access("/etc/china_ssr.txt") then 
+ ip_count = sys.exec("cat /etc/china_ssr.txt | wc -l")
 end
 
 local icount=sys.exec("ps -w | grep ssr-reudp |grep -v grep| wc -l")
@@ -123,11 +139,27 @@ s=m:field(DummyValue,"version",translate("IPK Version"))
 s.rawhtml  = true
 s.value =IPK_Version
 
-s=m:field(DummyValue,"google",translate("Google Connectivity")) 
+s=m:field(DummyValue,"google",translate("Google Connectivity"))
+s.value = translate("No Check") 
 s.template = "shadowsocksr/check"
 
 s=m:field(DummyValue,"baidu",translate("Baidu Connectivity")) 
+s.value = translate("No Check") 
 s.template = "shadowsocksr/check"
+
+if gfwmode==1 then 
+s=m:field(DummyValue,"gfw_data",translate("GFW List Data")) 
+s.rawhtml  = true
+s.template = "shadowsocksr/refresh"
+s.value =tostring(math.ceil(gfw_count)) .. " " .. translate("Records")
+end
+
+s=m:field(DummyValue,"ip_data",translate("China IP Data")) 
+s.rawhtml  = true
+s.template = "shadowsocksr/refresh"
+s.value =ip_count .. " " .. translate("Records")
+
+
 
 
 s=m:field(DummyValue,"kcp_version",translate("KcpTun Version")) 

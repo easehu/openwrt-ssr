@@ -255,3 +255,35 @@ msgstr "连接错误"
 
 msgid "Check..."
 msgstr "正在检查.."
+
+msgid "Proxy Check"
+msgstr "代理检查"
+
+
+msgid "GFW List Data"
+msgstr "GFW列表数据库"
+
+msgid "China IP Data"
+msgstr "国内IP数据库"
+
+msgid "Records"
+msgstr "条记录"
+
+msgid "Refresh Data"
+msgstr "刷新数据库"
+
+msgid "Refresh..."
+msgstr "正在刷新，请稍候.."
+
+msgid "Refresh OK!"
+msgstr "刷新成功！"
+
+msgid "Refresh Error!"
+msgstr "刷新失败！"
+
+msgid "No new data!"
+msgstr "你已经是最新数据！"
+
+msgid "Total Records:"
+msgstr "新的总纪录数："
+
