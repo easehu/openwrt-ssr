@@ -2,16 +2,16 @@
 
 <script type="text/javascript">//<![CDATA[
 
-	function check_<%=self.option%>_connect(btn)
+	function check_connect(btn,urlname)
 	{
 		btn.disabled = true;
 		btn.value    = '<%:Check...%>';
-		murl="<%=self.option%>"
+		murl=urlname
 		XHR.get('<%=luci.dispatcher.build_url("admin", "services", "shadowsocksr","check")%>',
 			{ set:murl },
 			function(x,rv)
 			{
-			var s = document.getElementById('<%=self.option%>-status');
+			var s = document.getElementById(urlname+'-status');
 			if (s)
 			{
 				if (rv.ret=="0")
@@ -23,7 +23,7 @@
 			}
 
 				btn.disabled = false;
-				btn.value    = '<%:Check%>';
+				btn.value    = '<%:Check Connect%>';
 			}
 		);
 
@@ -31,8 +31,8 @@
 	}
 //]]></script>
 
-<span id="<%=self.option%>-status"><em><%=self.value%></em></span>
-<input type="button" class="cbi-button cbi-button-apply" value="<%:Check%>" onclick="return check_<%=self.option%>_connect(this)" />
 
+<input type="button" class="cbi-button cbi-button-apply" value="<%:Check Connect%>" onclick="return check_connect(this,'<%=self.option%>')" />
+<span id="<%=self.option%>-status"><em><%=self.value%></em></span>
 
 <%+cbi/valuefooter%>

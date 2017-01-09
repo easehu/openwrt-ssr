@@ -125,7 +125,6 @@ else
 s.value = translate("Not Running")
 end
 
-
 s=m:field(DummyValue,"kcptun_run",translate("KcpTun")) 
 s.rawhtml  = true
 if kcptun_run == 1 then
@@ -133,11 +132,6 @@ s.value =font_blue .. bold_on .. translate("Running") .. bold_off .. font_off
 else
 s.value = translate("Not Running")
 end
-
-
-s=m:field(DummyValue,"version",translate("IPK Version")) 
-s.rawhtml  = true
-s.value =IPK_Version
 
 s=m:field(DummyValue,"google",translate("Google Connectivity"))
 s.value = translate("No Check") 
@@ -159,8 +153,14 @@ s.rawhtml  = true
 s.template = "shadowsocksr/refresh"
 s.value =ip_count .. " " .. translate("Records")
 
+s=m:field(DummyValue,"check_port",translate("Check Server Port"),translate("Don't use proxy when check")) 
+s.rawhtml  = true
+s.template = "shadowsocksr/checkport"
+s.value =translate("No Check")
 
-
+s=m:field(DummyValue,"version",translate("IPK Version")) 
+s.rawhtml  = true
+s.value =IPK_Version
 
 s=m:field(DummyValue,"kcp_version",translate("KcpTun Version")) 
 s.rawhtml  = true

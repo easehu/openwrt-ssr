@@ -2,16 +2,16 @@
 
 <script type="text/javascript">//<![CDATA[
 
-	function check_<%=self.option%>_connect(btn)
+	function refresh_data(btn,dataname)
 	{
 		btn.disabled = true;
 		btn.value    = '<%:Refresh...%> ';
-		murl="<%=self.option%>"
+		murl=dataname
 		XHR.get('<%=luci.dispatcher.build_url("admin", "services", "shadowsocksr","refresh")%>',
 			{ set:murl },
 			function(x,rv)
 			{
-			var s = document.getElementById('<%=self.option%>-status');
+			var s = document.getElementById(dataname+'-status');
 			if (s)
 			{
 				if (rv.ret=="0")
@@ -37,8 +37,8 @@
 	}
 //]]></script>
 
-<span id="<%=self.option%>-status"><em><%=self.value%></em></span>
-<input type="button" class="cbi-button cbi-input-reload" value="<%:Refresh Data%> " onclick="return check_<%=self.option%>_connect(this)" />
 
+<input type="button" class="cbi-button cbi-input-reload" value="<%:Refresh Data%> " onclick="return refresh_data(this,'<%=self.option%>')" />
+<span id="<%=self.option%>-status"><em><%=self.value%></em></span>
 
 <%+cbi/valuefooter%>

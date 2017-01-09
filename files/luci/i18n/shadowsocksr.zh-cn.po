@@ -236,10 +236,10 @@ msgid "UDP Relay"
 msgstr "UDP中继"
 
 msgid "Google Connectivity"
-msgstr "Google 连通性"
+msgstr "【谷歌】连通性检查"
 
 msgid "Baidu Connectivity"
-msgstr "百度连通性"
+msgstr "【百度】连通性检查"
 
 msgid "No Check"
 msgstr "未检查"
@@ -261,29 +261,40 @@ msgstr "代理检查"
 
 
 msgid "GFW List Data"
-msgstr "GFW列表数据库"
+msgstr "【GFW列表】数据库"
 
 msgid "China IP Data"
-msgstr "国内IP数据库"
+msgstr "【国内IP段】数据库"
 
 msgid "Records"
 msgstr "条记录"
 
 msgid "Refresh Data"
-msgstr "刷新数据库"
+msgstr "更新数据库"
 
 msgid "Refresh..."
-msgstr "正在刷新，请稍候.."
+msgstr "正在更新，请稍候.."
 
 msgid "Refresh OK!"
-msgstr "刷新成功！"
+msgstr "更新成功！"
 
 msgid "Refresh Error!"
-msgstr "刷新失败！"
+msgstr "更新失败！"
 
 msgid "No new data!"
-msgstr "你已经是最新数据！"
+msgstr "你已经是最新数据，无需更新！"
 
 msgid "Total Records:"
 msgstr "新的总纪录数："
 
+msgid "Check Server Port"
+msgstr "【服务器端口】检查"
+
+msgid "Check Connect"
+msgstr "检查连通性"
+
+msgid "Check Server"
+msgstr "检查服务器"
+
+msgid "Don't use proxy when check"
+msgstr "检查服务器端口时不要让路由器通过代理，否则检查结果不正确。"
