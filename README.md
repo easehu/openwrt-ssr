@@ -105,7 +105,7 @@ ShadowsocksR-libev for OpenWrt
 
 GFW版本支持IP路由模式和GFW列表模式，需卸载原有的dnsmasq，会接管OpenWRT的域名处理，避免域名污染并实现准确分流；SSR服务器侧需开启UDP转发；
 
-提醒：如果安装GFW版本，请停用当前针对域名污染的其他处理软件，不要占用UDP 5353端口，并做好必要的数据备份，比如/etc/dnsmasq.conf文件，安装过程会覆盖此文件，如提示文件冲突，请先将此文件改名后再安装
+提醒：如果安装GFW版本，请停用当前针对域名污染的其他处理软件，不要占用UDP 5353端口，并做好必要的数据备份，比如/etc/dnsmasq.conf文件，安装过程会将此文件改名为dnsmasq_bak.conf
 
 将编译成功的luci-app-shadowsocksR*_all.ipk通过winscp上传到路由器的/tmp目录，执行命令：
 
@@ -188,10 +188,12 @@ GFW版本支持IP路由模式和GFW列表模式，需卸载原有的dnsmasq，�
    
    如要打开kcptun的日志，可以在kcptun参数栏填入"--nocomp --log /var/log/kcptun.log"，日志会保存在指定文件中
    
-   IP路由模式的数据文件为/etc/china_ssr.txt,包含国内所有IP网段，一般无需更新，如要更新，在openwrt上执行"get_chinaip"命令即可，注意：如果刷新必须等待命令运行完成，否则可能损坏数据库
+   IP路由模式的数据文件为/etc/china_ssr.txt,包含国内所有IP网段，一般很少变动，无需更新，如要更新，请在“状态”页面更新
    
-   FGW列表模式的数据文件为/etc/dnsmasq.ssr/gfw_list.conf，包含所有被墙网站，如需更新，请自行寻找替换此文件
+   GFW列表模式的数据文件为/etc/dnsmasq.ssr/gfw_list.conf，包含所有被墙网站，如需更新，请在“状态”页面更新
    
+   使用服务器端口检查功能时，不能让路由器本身通过代理访问，否则因为代理对客户端的任何请求都会先返回连接成功，会导致检查的所有服务器不管真实状态如何结果都为正确。
+   可停止代理或使用GFW模式或者在LAN控制中设置路由器不通过代理访问。
 
 
 问题和建议反馈
@@ -210,7 +212,7 @@ GFW版本支持IP路由模式和GFW列表模式，需卸载原有的dnsmasq，�
 
 状态页面：
 
-![luci000](http://iytc.net/img/ssr84.jpg)
+![luci000](http://iytc.net/img/ssr85.jpg)
 
   [1]: https://github.com/breakwa11/shadowsocks-libev
   [2]: https://github.com/shadowsocks/luci-app-shadowsocks/wiki/Encrypt-method
