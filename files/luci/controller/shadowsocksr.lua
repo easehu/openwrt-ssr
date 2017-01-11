@@ -33,16 +33,12 @@ function index()
 end
 
 function check_status()
-local set ="www." .. luci.http.formvalue("set") .. ".com"
-local socket = nixio.socket("inet", "stream")
-socket:setopt("socket", "rcvtimeo", 3)
-socket:setopt("socket", "sndtimeo", 3)
-local ret=socket:connect(set,80)
-if  tostring(ret) == "true" then
-socket:close()
-retstring ="0"
+local set ="/usr/bin/ssr-check www." .. luci.http.formvalue("set") .. ".com 80 3 1"
+sret=luci.sys.call(set)
+if sret== 0 then
+ retstring ="0"
 else
-retstring ="1"
+ retstring ="1"
 end	
 luci.http.prepare_content("application/json")
 luci.http.write_json({ ret=retstring })
@@ -107,6 +103,7 @@ local s
 local server_name = ""
 local shadowsocksr = "shadowsocksr"
 local uci = luci.model.uci.cursor()
+local iret=1
 
 uci:foreach(shadowsocksr, "servers", function(s)
 
@@ -115,7 +112,7 @@ uci:foreach(shadowsocksr, "servers", function(s)
 	elseif s.server and s.server_port then
 		server_name= "%s:%s" %{s.server, s.server_port}
 	end
-	
+	iret=luci.sys.call(" ipset add ss_spec_wan_ac " .. s.server)
 	socket = nixio.socket("inet", "stream")
 	socket:setopt("socket", "rcvtimeo", 3)
 	socket:setopt("socket", "sndtimeo", 3)
@@ -126,7 +123,9 @@ uci:foreach(shadowsocksr, "servers", function(s)
 	else
 	retstring =retstring .. "<font color='red'>[" .. server_name .. "] Error.</font><br />"
 	end	
-	
+	if  iret== 0 then
+	luci.sys.call(" ipset del ss_spec_wan_ac " .. s.server)
+	end
 end)
 
 luci.http.prepare_content("application/json")

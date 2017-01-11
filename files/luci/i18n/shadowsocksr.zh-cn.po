@@ -298,3 +298,15 @@ msgstr "检查服务器"
 
 msgid "Don't use proxy when check"
 msgstr "检查服务器端口时不要让路由器通过代理，否则检查结果不正确。"
+
+msgid "Auto Switch"
+msgstr "自动切换"
+
+msgid "Enable Auto Switch"
+msgstr "启用自动切换"
+
+msgid "Switch check cycly(second)"
+msgstr "自动切换检查周期（秒）"
+
+msgid "Check timout(second)"
+msgstr "切换检查超时时间（秒）"

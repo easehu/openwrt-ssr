@@ -13,7 +13,7 @@ STOP=15
 SERVICE_DAEMONIZE=1
 NAME=shadowsocksr
 EXTRA_COMMANDS=rules
-CONFIG_FILE=/var/etc/$NAME.json
+CONFIG_FILE=/var/etc/${NAME}.json
 CONFIG_UDP_FILE=/var/etc/${NAME}_u.json
 CONFIG_SOCK5_FILE=/var/etc/${NAME}_s.json
 server_count=0
@@ -25,6 +25,8 @@ kcp_enable_flag=0
 kcp_flag=0
 gfw_enable=0
 dns_enable_flag=0
+switch_enable=0
+switch_server=$1
 
 
 uci_get_by_name() {
@@ -207,6 +209,16 @@ start_redir() {
 	dns_enable_flag=1
 	fi
 	
+	if [ "$(uci_get_by_type global enable_switch)" = "1" ] ;then
+	if [ "$(uci_get_by_name $GLOBAL_SERVER switch_enable)" = "1" ] ;then
+	if [ -z "$switch_server" ] ;then
+	local switch_time=$(uci_get_by_type global switch_time)
+	local switch_timeout=$(uci_get_by_type global switch_timeout)
+	service_start /usr/bin/ssr-switch start $switch_time $switch_timeout
+	switch_enable=1
+	fi
+	fi
+	fi
 	
 	return $?
 }
@@ -281,7 +293,6 @@ start_local() {
 }
 
 rules() {
-	GLOBAL_SERVER=$(uci_get_by_type global global_server)
 	[ "$GLOBAL_SERVER" = "nil" ] && return 1
 	mkdir -p /var/run /var/etc
 	UDP_RELAY_SERVER=$(uci_get_by_type global udp_relay_server)
@@ -295,6 +306,12 @@ rules() {
 
 start() {
 	gfw_enable=$(uci_get_by_type global gfw_enable)	
+	if [ -z "$switch_server" ] ;then
+	GLOBAL_SERVER=$(uci_get_by_type global global_server)
+	else
+	GLOBAL_SERVER=$switch_server
+	switch_enable=1
+	fi
 	if rules ;then
 	start_redir
 	
@@ -308,11 +325,11 @@ start() {
 	start_server	
 	start_local
 	if [ $(uci_get_by_type global monitor_enable) = 1 ] ;then
-	let total_count=server_count+redir_tcp+redir_udp+tunnel_enable+kcp_enable_flag+local_enable+dns_enable_flag
+	let total_count=server_count+redir_tcp+redir_udp+tunnel_enable+kcp_enable_flag+local_enable+dns_enable_flag+switch_enable
 	if [ $total_count -gt 0 ]
 	then
 	#param:server(count) redir_tcp(0:no,1:yes)  redir_udp tunnel kcp local gfw
-	service_start /usr/bin/ssr-monitor $server_count $redir_tcp $redir_udp $tunnel_enable $kcp_enable_flag $local_enable $dns_enable_flag
+	service_start /usr/bin/ssr-monitor $server_count $redir_tcp $redir_udp $tunnel_enable $kcp_enable_flag $local_enable $dns_enable_flag $switch_enable
 	fi
 	fi
 	
@@ -326,8 +343,11 @@ stop() {
 	iptables -t filter -D INPUT  -j SSR-SERVER-RULE
 	iptables -X SSR-SERVER-RULE 2>/dev/null
 	fi
-
+  
 	killall -q -9 ssr-monitor
+	if [ -z "$switch_server" ] ;then
+	killall -q -9 ssr-switch
+	fi
 	killall -q -9 ssr-redir
 	killall -q -9 ssr-tunnel
 	killall -q -9 ssr-server

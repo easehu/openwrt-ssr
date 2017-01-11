@@ -122,9 +122,14 @@ function o.cfgvalue(...)
 	return Value.cfgvalue(...) or "?"
 end
 
-o = sec:option(DummyValue, "kcp_enable", translate("KcpTun Enable"))
+o = sec:option(DummyValue, "kcp_enable", translate("KcpTun"))
 function o.cfgvalue(...)
 	return Value.cfgvalue(...) or "?"
+end
+
+o = sec:option(DummyValue, "switch_enable", translate("Auto Switch"))
+function o.cfgvalue(...)
+	return Value.cfgvalue(...) or "0"
 end
 
 -- [[ Global Setting ]]--
@@ -144,6 +149,19 @@ for k, v in pairs(server_table) do o:value(k, v) end
 
 o = s:option(Flag, "monitor_enable", translate("Enable Process Monitor"))
 o.rmempty = false
+
+o = s:option(Flag, "enable_switch", translate("Enable Auto Switch"))
+o.rmempty = false
+
+o = s:option(Value, "switch_time", translate("Switch check cycly(second)"))
+o.datatype = "uinteger"
+o:depends("enable_switch", "1")
+o.default = 600
+
+o = s:option(Value, "switch_timeout", translate("Check timout(second)"))
+o.datatype = "uinteger"
+o:depends("enable_switch", "1")
+o.default = 3
 
 if gfwmode==0 then 
 
