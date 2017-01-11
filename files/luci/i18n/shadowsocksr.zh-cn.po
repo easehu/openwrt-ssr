@@ -296,9 +296,6 @@ msgstr "检查连通性"
 msgid "Check Server"
 msgstr "检查服务器"
 
-msgid "Don't use proxy when check"
-msgstr "检查服务器端口时不要让路由器通过代理，否则检查结果不正确。"
-
 msgid "Auto Switch"
 msgstr "自动切换"
 
