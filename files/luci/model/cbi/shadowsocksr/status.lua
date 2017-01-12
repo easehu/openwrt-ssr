@@ -153,7 +153,7 @@ s.rawhtml  = true
 s.template = "shadowsocksr/refresh"
 s.value =ip_count .. " " .. translate("Records")
 
-s=m:field(DummyValue,"check_port",translate("Check Server Port")£©
+s=m:field(DummyValue,"check_port",translate("Check Server Port"))
 s.template = "shadowsocksr/checkport"
 s.value =translate("No Check")
 
