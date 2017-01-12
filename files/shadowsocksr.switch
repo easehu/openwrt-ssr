@@ -9,6 +9,10 @@
 
 local cycle_time=60
 local switch_time=3
+local normal_flag=0
+local current_locate=0
+local server_locate=0
+local server_count=0
 NAME=shadowsocksr
 ENABLE_SERVER=nil
 CONFIG_SWTICH_FILE=/var/etc/${NAME}_t.json
@@ -69,10 +73,11 @@ fi
 }
 
 search_proxy() {
-
+let server_count=server_count+1
+[ "$normal_flag" = "1" -a "$server_count" -le "$current_locate" ] && return 0
 [ "$(uci_get_by_name $1 switch_enable)" != "1"  ]  && return 1
 [ $ENABLE_SERVER != nil ] && return 0
-[ "$1" = "CURRENT_SERVER" ] && return 0
+[ "$1" = "$CURRENT_SERVER" ] && return 0
 local servername=$(uci_get_by_name $1 server)
 local serverport=$(uci_get_by_name $1 server_port)
 ipset add ss_spec_wan_ac $servername 2>/dev/null
@@ -83,6 +88,7 @@ if [ "$ret" = "0" ] ;then
 ipset del ss_spec_wan_ac $servername 2>/dev/null
 fi
 if [ "$ret2" = "0" ] ;then
+server_locate=$server_count
 ENABLE_SERVER=$1
 return 0
 else
@@ -96,8 +102,9 @@ select_proxy() {
 config_load $NAME
 ENABLE_SERVER=nil
 mkdir -p /var/run /var/etc
+server_count=0
 config_foreach search_proxy servers
-echo $ENABLE_SERVER
+
 }
 
 #切换代理
@@ -137,15 +144,22 @@ do
    if [ "$current_ret" = "1" ] ;then
      #当前代理错误，判断有无可用的服务器
      #echo "current error"
-     new_proxy=$(select_proxy)
-     if [ "$new_proxy" != nil ] ;then
+     
+     select_proxy
+     if [ "$ENABLE_SERVER" != nil ] ;then
       #有其他服务器可用，进行切换
       #echo $(uci_get_by_name $new_proxy server)
-      CURRENT_SERVER=$new_proxy
+      CURRENT_SERVER=$ENABLE_SERVER
       switch_proxy $CURRENT_SERVER
+      current_locate=$server_locate
+      normal_flag=1
       logger -t "$NAME" "switch proxy ["$(uci_get_by_name $CURRENT_SERVER server)"] success!"
       #echo "switch ok"
+     else
+     normal_flag=0 
      fi
+   else
+    normal_flag=0   
    fi
 
 
