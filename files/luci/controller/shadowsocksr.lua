@@ -54,7 +54,7 @@ if set == "gfw_data" then
  else
   refresh_cmd="wget -O /tmp/gfw.b64 http://iytc.net/tools/list.b64"
  end
- sret=luci.sys.call(refresh_cmd)
+ sret=luci.sys.call(refresh_cmd .. " 2>/dev/null")
  if sret== 0 then
   luci.sys.call("/usr/bin/ssr-gfw")
   icount = luci.sys.exec("cat /tmp/gfwnew.txt | wc -l")
@@ -74,7 +74,7 @@ if set == "gfw_data" then
   retstring ="-1"
  end
 else
- refresh_cmd="wget -O- 'http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest' | awk -F\\| '/CN\\|ipv4/ { printf(\"%s/%d\\n\", $4, 32-log($5)/log(2)) }' > /tmp/china_ssr.txt"
+ refresh_cmd="wget -O- 'http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest'  2>/dev/null| awk -F\\| '/CN\\|ipv4/ { printf(\"%s/%d\\n\", $4, 32-log($5)/log(2)) }' > /tmp/china_ssr.txt"
  sret=luci.sys.call(refresh_cmd)
  icount = luci.sys.exec("cat /tmp/china_ssr.txt | wc -l")
  if  sret== 0 and tonumber(icount)>1000 then
@@ -112,7 +112,7 @@ uci:foreach(shadowsocksr, "servers", function(s)
 	elseif s.server and s.server_port then
 		server_name= "%s:%s" %{s.server, s.server_port}
 	end
-	iret=luci.sys.call(" ipset add ss_spec_wan_ac " .. s.server)
+	iret=luci.sys.call(" ipset add ss_spec_wan_ac " .. s.server .. " 2>/dev/null")
 	socket = nixio.socket("inet", "stream")
 	socket:setopt("socket", "rcvtimeo", 3)
 	socket:setopt("socket", "sndtimeo", 3)
