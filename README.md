@@ -203,6 +203,8 @@ GFW版本支持IP路由模式和GFW列表模式，需卸载原有的dnsmasq，�
    ```
    添加后执行/etc/init.d/dnsmasq restart重启dnsmasq
    
+   广告过滤数据文件为/etc/dnsmasq.ssr/ad.conf，其原理是将广告网站的IP地址解析为127.0.0.1，使用的数据库为easylistchina+easylist，广告过滤模块缺省未安装，用户在“状态”页面更新广告数据库后自动打开，如打开广告过滤后出现问题，请删除此文件并重启dnsmasq
+   
    自动切换说明：在服务器配置中如果某些服务器启用了自动切换开关，这些服务器就组成一个可以自动切换的服务器集合，当这些服务器中的某一个作为全局服务器使用，并打开了全局自动切换开关时，如果全局服务器故障，会自动在集合中寻找可用的服务器进行切换。你可以设置检测周期和超时时间。每次检测时会判断缺省服务器是否恢复正常，如果正常，会自动切换回缺省服务器。注：自动切换功能依赖路由器的检测，因此在“路由器访问控制”中应该设置为“正常代理”
    
    自动切换和进程监控的日志可以在OpenWRT的“系统日志”中查看
@@ -224,7 +226,7 @@ GFW版本支持IP路由模式和GFW列表模式，需卸载原有的dnsmasq，�
 
 状态页面：
 
-![luci000](http://iytc.net/img/ssr93.jpg)
+![luci000](http://iytc.net/img/ssr120.jpg)
 
   [1]: https://github.com/breakwa11/shadowsocks-libev
   [2]: https://github.com/shadowsocks/luci-app-shadowsocks/wiki/Encrypt-method
