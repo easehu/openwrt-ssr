@@ -307,3 +307,6 @@ msgstr "自动切换检查周期（秒）"
 
 msgid "Check timout(second)"
 msgstr "切换检查超时时间（秒）"
+
+msgid "Advertising Data"
+msgstr "【广告屏蔽】数据库"

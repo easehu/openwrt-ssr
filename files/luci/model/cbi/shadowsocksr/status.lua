@@ -1,7 +1,7 @@
 -- Copyright (C) 2017 yushi studio <ywb94@qq.com>
 -- Licensed to the public under the GNU General Public License v3.
 
-local IPK_Version="1.1.9"
+local IPK_Version="1.2.0"
 local m, s, o
 local redir_run=0
 local reudp_run=0
@@ -10,6 +10,7 @@ local server_run=0
 local kcptun_run=0
 local tunnel_run=0
 local gfw_count=0
+local ad_count=0
 local ip_count=0
 local gfwmode=0
 
@@ -43,6 +44,9 @@ end
 
 if gfwmode==1 then 
  gfw_count = tonumber(sys.exec("cat /etc/dnsmasq.ssr/gfw_list.conf | wc -l"))/2
+ if nixio.fs.access("/etc/dnsmasq.ssr/ad.conf") then
+  ad_count=tonumber(sys.exec("cat /etc/dnsmasq.ssr/ad.conf | wc -l"))
+ end
 end
  
 if nixio.fs.access("/etc/china_ssr.txt") then 
@@ -146,6 +150,11 @@ s=m:field(DummyValue,"gfw_data",translate("GFW List Data"))
 s.rawhtml  = true
 s.template = "shadowsocksr/refresh"
 s.value =tostring(math.ceil(gfw_count)) .. " " .. translate("Records")
+
+s=m:field(DummyValue,"ad_data",translate("Advertising Data")) 
+s.rawhtml  = true
+s.template = "shadowsocksr/refresh"
+s.value =tostring(math.ceil(ad_count)) .. " " .. translate("Records")
 end
 
 s=m:field(DummyValue,"ip_data",translate("China IP Data")) 

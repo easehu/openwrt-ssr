@@ -60,7 +60,6 @@ flush_r() {
 	ipset -X ss_spec_lan_ac 2>/dev/null
 	ipset -X ss_spec_wan_ac 2>/dev/null
 	ipset -X ssr_gen_router 2>/dev/null
-	ipset -X gfwlist 2>/dev/null
 	[ -n "$FWI" ] && echo '#!/bin/sh' >$FWI
 	return 0
 }
