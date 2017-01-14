@@ -14,7 +14,7 @@ PKG_VERSION:=1.1.9
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://github.com/ywb94/shadowsocks-libev
-PKG_SOURCE_VERSION:=7b422bd4620c4b58a7168c22abd50a070cdd1e23
+PKG_SOURCE_VERSION:=11db1d5e48f539855ea1a66947eba9bb9bc82150
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
@@ -64,20 +64,24 @@ define Package/openwrt-ssr/prerm
 # check if we are on real system
 if [ -z "$${IPKG_INSTROOT}" ]; then
     echo "Removing rc.d symlink for shadowsocksr"
-     /etc/init.d/$(1) disable
-     /etc/init.d/$(1) stop
+     /etc/init.d/shadowsocksr disable
+     /etc/init.d/shadowsocksr stop
     echo "Removing firewall rule for shadowsocksr"
 	  uci -q batch <<-EOF >/dev/null
 		delete firewall.shadowsocksr
 		commit firewall
 EOF
+if [ "$(1)" = "GFW" ] ;then
+sed -i '/conf-dir/d' /etc/dnsmasq.conf 
+/etc/init.d/dnsmasq restart 
+fi
 fi
 exit 0
 endef
 
 Package/luci-app-shadowsocksR/prerm = $(call Package/openwrt-ssr/prerm,shadowsocksr)
 Package/luci-app-shadowsocksR-Client/prerm = $(call Package/openwrt-ssr/prerm,shadowsocksr)
-Package/luci-app-shadowsocksR-GFW/prerm = $(call Package/openwrt-ssr/prerm,shadowsocksr)
+Package/luci-app-shadowsocksR-GFW/prerm = $(call Package/openwrt-ssr/prerm,GFW)
 
 define Package/luci-app-shadowsocksR-Server/prerm
 #!/bin/sh
@@ -89,16 +93,6 @@ exit 0
 
 endef
 
-define Package/openwrt-ssr/preinst
-#!/bin/sh
-
-if [ -f "/etc/dnsmasq.conf" ]; then
- mv /etc/dnsmasq.conf /etc/dnsmasq_bak.conf
-fi
-exit 0
-endef
-
-Package/luci-app-shadowsocksR-GFW/preinst = $(call Package/openwrt-ssr/preinst)
 
 define Package/openwrt-ssr/postinst
 #!/bin/sh
@@ -115,9 +109,24 @@ EOF
 fi
 
 if [ -z "$${IPKG_INSTROOT}" ]; then
-	( . /etc/uci-defaults/luci-$(1) ) && rm -f /etc/uci-defaults/luci-$(1)
-	chmod 755 /etc/init.d/$(1) >/dev/null 2>&1
-	/etc/init.d/$(1) enable >/dev/null 2>&1
+	( . /etc/uci-defaults/luci-shadowsocksr ) && rm -f /etc/uci-defaults/luci-shadowsocksr
+	chmod 755 /etc/init.d/shadowsocksr >/dev/null 2>&1
+	/etc/init.d/shadowsocksr enable >/dev/null 2>&1
+	
+	if [ "$(1)" = "GFW" ] ;then
+	 if [ -f "/etc/dnsmasq.conf" ]; then
+   str=`cat /etc/dnsmasq.conf|grep conf-dir`
+    if [ -z "$str" ]; then
+     echo "conf-dir=/etc/dnsmasq.ssr" >> /etc/dnsmasq.conf
+    else
+     sed -i '/conf-dir/d' /etc/dnsmasq.conf  
+     echo "conf-dir=/etc/dnsmasq.ssr" >> /etc/dnsmasq.conf
+    fi 
+   else
+    echo "conf-dir=/etc/dnsmasq.ssr" > /etc/dnsmasq.conf
+   fi
+	 /etc/init.d/dnsmasq restart 
+	fi
 fi
 exit 0
 endef
@@ -125,7 +134,7 @@ endef
 
 Package/luci-app-shadowsocksR/postinst = $(call Package/openwrt-ssr/postinst,shadowsocksr)
 Package/luci-app-shadowsocksR-Client/postinst = $(call Package/openwrt-ssr/postinst,shadowsocksr)
-Package/luci-app-shadowsocksR-GFW/postinst = $(call Package/openwrt-ssr/postinst,shadowsocksr)
+Package/luci-app-shadowsocksR-GFW/postinst = $(call Package/openwrt-ssr/postinst,GFW)
 
 define Package/luci-app-shadowsocksR-Server/postinst
 #!/bin/sh
@@ -247,7 +256,6 @@ define Package/luci-app-shadowsocksR-GFW/install
 	$(INSTALL_DATA) ./files/shadowsocksr.config $(1)/etc/config/shadowsocksr
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DATA) ./files/china_ssr.txt $(1)/etc/china_ssr.txt	
-	$(INSTALL_DATA) ./files/dnsmasq.conf $(1)/etc/dnsmasq.conf
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/shadowsocksr.init $(1)/etc/init.d/shadowsocksr
 endef
