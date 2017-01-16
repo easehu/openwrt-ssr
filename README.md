@@ -14,17 +14,17 @@ ShadowsocksR-libev for OpenWrt
 
 软件包包含 [shadowsocksr-libev][1] 的可执行文件,以及luci控制界面  
 
-支持SSR客户端、服务端模式（服务端支持部分混淆模式、支持多端口）；支持SOCK5代理
+支持SSR客户端、服务端模式（服务端支持部分混淆模式、支持多端口）
+
+支持SOCK5代理；支持UDP中继；支持广告屏蔽
 
 支持两种运行模式：IP路由模式和GFW列表模式（GFWList）
 
-可以和[Shadowsocks][5]共存，在openwrt上可以通过luci界面切换使用[Shadowsocks][6]或ShadowsocksR
+所有进程自动守护，崩溃后自动重启；支持服务器自动切换；
 
 集成[KcpTun加速][4]，此功能对路由器性能要求较高，需下载对应的二进制文件到路由器指定目录，请酌情使用
 
 客户端兼容运行SS或SSR的服务器，使用SS服务器时，传输协议需设置为origin，混淆插件需设置为plain
-
-所有进程自动守护，崩溃后自动重启
 
 运行模式介绍
 ---
@@ -44,8 +44,10 @@ ShadowsocksR-libev for OpenWrt
 
 缺点：GFW列表并不能100%涵盖被墙站点，而且有些国外站点直连速度远不如走代理 
 
-注意：如果要使用SSR for OpenWRT的服务端接收手机的接入，请使用IP路由模式，原因是手机通过无线网络接入OpenWRT服务端，手机上如果要访问google，它使用的是手机上的DNS解析，域名解析是被污染的，指向的是一个随机IP，此IP不能和GFW列表匹配，因此如果使用GFW模式，将不能科学上网
+注意：如果要使用SSR for OpenWRT的服务端接收手机的接入（通过3G/4G网络），请使用IP路由模式，原因是手机通过无线网络接入OpenWRT服务端，手机上如果要访问google，它使用的是手机上的DNS解析，域名解析是被污染的，指向的是一个随机IP，此IP不能和GFW列表匹配，因此如果使用GFW模式，将不能科学上网
 
+
+如果在IP路由模式下代理正常，在GFW列表模式下无法正常访问，请检查DNS解析是否正确（服务器是否开启UDP转发、是否有其他dns软件冲突等）
 
 编译
 ---
@@ -97,7 +99,7 @@ ShadowsocksR-libev for OpenWrt
    
 安装
 --- 
-本软件包依赖库：libopenssl、libpthread、ipset、ip、iptables-mod-tproxy、libpcre、dnsmasq-full，GFW版本还需依赖dnsmasq-full，opkg会自动安装上述库文件
+本软件包依赖库：libopenssl、libpthread、ipset、ip、iptables-mod-tproxy、libpcre，GFW版本还需依赖dnsmasq-full、coreutils-base64，opkg会自动安装上述库文件
 
 软件编译后可生成两个软件包，分别是luci-app-shadowsocksR（原始版本）、luci-app-shadowsocksR-GFW（GFW版本），用户根据需要选择其中一个安装即可
 
@@ -105,7 +107,7 @@ ShadowsocksR-libev for OpenWrt
 
 GFW版本支持IP路由模式和GFW列表模式，需卸载原有的dnsmasq，会接管OpenWRT的域名处理，避免域名污染并实现准确分流；SSR服务器侧需开启UDP转发；
 
-提醒：如果安装GFW版本，请停用当前针对域名污染的其他处理软件，不要占用UDP 5353端口，并做好必要的数据备份，比如/etc/dnsmasq.conf文件，安装过程会将此文件改名为dnsmasq_bak.conf
+提醒：如果安装GFW版本，请停用当前针对域名污染的其他处理软件，不要占用UDP 5353端口
 
 将编译成功的luci-app-shadowsocksR*_all.ipk通过winscp上传到路由器的/tmp目录，执行命令：
 
@@ -203,7 +205,7 @@ GFW版本支持IP路由模式和GFW列表模式，需卸载原有的dnsmasq，�
    ```
    添加后执行/etc/init.d/dnsmasq restart重启dnsmasq
    
-   广告过滤数据文件为/etc/dnsmasq.ssr/ad.conf，其原理是将广告网站的IP地址解析为127.0.0.1，使用的数据库为easylistchina+easylist，广告过滤模块缺省未安装，用户在“状态”页面更新广告数据库后自动打开，如打开广告过滤后出现问题，请删除此文件并重启dnsmasq
+   广告过滤为GFW版本特有，数据文件为/etc/dnsmasq.ssr/ad.conf，其原理是将广告网站的IP地址解析为127.0.0.1，使用的数据库为easylistchina+easylist；广告过滤模块缺省未安装，用户在“状态”页面更新广告数据库后自动打开，如打开广告过滤后出现问题，请删除此文件并重启dnsmasq
    
    自动切换说明：在服务器配置中如果某些服务器启用了自动切换开关，这些服务器就组成一个可以自动切换的服务器集合，当这些服务器中的某一个作为全局服务器使用，并打开了全局自动切换开关时，如果全局服务器故障，会自动在集合中寻找可用的服务器进行切换。你可以设置检测周期和超时时间。每次检测时会判断缺省服务器是否恢复正常，如果正常，会自动切换回缺省服务器。注：自动切换功能依赖路由器的检测，因此在“路由器访问控制”中应该设置为“正常代理”
    
