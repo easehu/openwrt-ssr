@@ -10,10 +10,15 @@ local sys = require "luci.sys"
 
 local gfwmode=0
 
+local pdnsd_flag=0
+
 if nixio.fs.access("/etc/dnsmasq.ssr/gfw_list.conf") then
 gfwmode=1		
 end
 
+if nixio.fs.access("/etc/pdnsd.conf") then
+pdnsd_flag=1		
+end
 
 m = Map(shadowsocksr, translate("ShadowSocksR Client"))
 
@@ -176,16 +181,25 @@ o.rmempty = false
 
 else
 
+
+
 o = s:option(ListValue, "gfw_enable", translate("Operating mode"))
 o:value("router", translate("IP Route Mode"))
 o:value("gfw", translate("GFW List Mode"))
 o.rmempty = false
 
+if pdnsd_flag==1 then
+o = s:option(ListValue, "pdnsd_enable", translate("Resolve Dns Mode"),translate("If use pdnsd,Set pdnsd server_port to 5353"))
+o:value("0", translate("Use DNS Tunnel"))
+o:value("1", translate("Use Pdnsd"))
+o.rmempty = false
+end
+
 end
 
 o = s:option(Value, "tunnel_forward", translate("Forwarding Tunnel"))
 o.default = "8.8.4.4:53"
-o.rmempty = false
+o:depends("pdnsd_enable", "0")
 
 -- [[ SOCKS5 Proxy ]]--
 s = m:section(TypedSection, "socks5_proxy", translate("SOCKS5 Proxy"))

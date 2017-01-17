@@ -205,8 +205,10 @@ start_redir() {
 	
 	if  [ -n "$gfw_enable" ] ;then
 	#always on,deal with dns
+	if [ "$(uci_get_by_type global pdnsd_enable)" != "1" ] ;then
 	service_start /usr/bin/ssr-tunnel -c $CONFIG_FILE -b 0.0.0.0 -u -l 5353 -L $(uci_get_by_type global tunnel_forward 8.8.4.4:53) -f /var/run/ssr-dns.pid
 	dns_enable_flag=1
+	fi
 	fi
 	
 	if [ "$(uci_get_by_type global enable_switch)" = "1" ] ;then
