@@ -82,7 +82,7 @@ ShadowsocksR-libev for OpenWrt
    po2lmo ./package/openwrt-ssr/files/luci/i18n/shadowsocksr.zh-cn.po ./package/openwrt-ssr/files/luci/i18n/shadowsocksr.zh-cn.lmo
    
    # 开始编译
-   make V=99
+    make package/openwrt-ssr/compile V=99
    ```
  - LEDE编译补充
  
