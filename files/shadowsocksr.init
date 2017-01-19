@@ -156,6 +156,58 @@ start_rules() {
 	return $?
 }
 
+start_pdnsd() {
+	local usr_dns="$1"
+  local usr_port="$2"
+  
+	local tcp_dns_list="208.67.222.222, 208.67.220.220"
+	[ -z "$usr_dns" ] && usr_dns="8.8.8.8"
+	[ -z "$usr_port" ] && usr_port="53"
+
+	mkdir -p /var/etc /var/pdnsd
+	cat > /var/etc/pdnsd.conf <<EOF
+global {
+	perm_cache=10240;
+	cache_dir="/var/pdnsd";
+	pid_file = /var/run/pdnsd.pid;
+	run_as="nobody";
+	server_ip = 127.0.0.1;
+	server_port = 5353;
+	status_ctl = on;
+	query_method = tcp_only;
+	min_ttl=1h;
+	max_ttl=1w;
+	timeout=10;
+	neg_domain_pol=on;
+	proc_limit=2;
+	procq_limit=8;
+}
+server {
+	label= "ssr-usrdns";
+	ip = $usr_dns;
+	port = $usr_port;
+	timeout=6;
+	uptest=none;
+	interval=10m;
+	purge_cache=off;
+}
+server {
+	label= "ssr-pdnsd";
+	ip = $tcp_dns_list;
+	port = 5353;
+	timeout=6;
+	uptest=none;
+	interval=10m;
+	purge_cache=off;
+}
+EOF
+
+	/usr/sbin/pdnsd -c /var/etc/pdnsd.conf -d
+
+
+
+}
+
 start_redir() {
 	case "$(uci_get_by_name $GLOBAL_SERVER auth_enable)" in
 		1|on|true|yes|enabled) ARG_OTA="-A";;
@@ -202,13 +254,18 @@ start_redir() {
 		/usr/bin/ssr-redir \
 		-c $last_config_file $ARG_OTA $ARG_UDP \
 		-f $pid_file
-	
+		
+	#deal with dns
 	if  [ -n "$gfw_enable" ] ;then
-	#always on,deal with dns
-	if [ "$(uci_get_by_type global pdnsd_enable)" != "1" ] ;then
-	service_start /usr/bin/ssr-tunnel -c $CONFIG_FILE -b 0.0.0.0 -u -l 5353 -L $(uci_get_by_type global tunnel_forward 8.8.4.4:53) -f /var/run/ssr-dns.pid
-	dns_enable_flag=1
-	fi
+	 if [ "$(uci_get_by_type global pdnsd_enable)" != "1" ] ;then
+	  service_start /usr/bin/ssr-tunnel -c $CONFIG_FILE -b 0.0.0.0 -u -l 5353 -L $(uci_get_by_type global tunnel_forward 8.8.4.4:53) -f /var/run/ssr-dns.pid
+	  dns_enable_flag=1
+	 else
+	  local dnsstr="$(uci_get_by_type global tunnel_forward 8.8.4.4:53)"
+	  local dnsserver=`echo "$dnsstr"|awk -F ':'  '{print $1}'`
+	  local dnsport=`echo "$dnsstr"|awk -F ':'  '{print $2}'`
+	  start_pdnsd $dnsserver $dnsport
+	 fi
 	fi
 	
 	if [ "$(uci_get_by_type global enable_switch)" = "1" ] ;then
@@ -355,6 +412,6 @@ stop() {
 	killall -q -9 ssr-server
 	killall -q -9 ssr-kcptun
 	killall -q -9 ssr-local
-	
+	killall -q -9 pdnsd
 
 }

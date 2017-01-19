@@ -189,7 +189,7 @@ o:value("gfw", translate("GFW List Mode"))
 o.rmempty = false
 
 if pdnsd_flag==1 then
-o = s:option(ListValue, "pdnsd_enable", translate("Resolve Dns Mode"),translate("If use pdnsd,Set pdnsd server_port to 5353"))
+o = s:option(ListValue, "pdnsd_enable", translate("Resolve Dns Mode"))
 o:value("0", translate("Use DNS Tunnel"))
 o:value("1", translate("Use Pdnsd"))
 o.rmempty = false
@@ -197,9 +197,9 @@ end
 
 end
 
-o = s:option(Value, "tunnel_forward", translate("Forwarding Tunnel"))
+o = s:option(Value, "tunnel_forward", translate("DNS Server IP and Port"))
 o.default = "8.8.4.4:53"
-o:depends("pdnsd_enable", "0")
+o.rmempty = false
 
 -- [[ SOCKS5 Proxy ]]--
 s = m:section(TypedSection, "socks5_proxy", translate("SOCKS5 Proxy"))

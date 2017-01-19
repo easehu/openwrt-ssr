@@ -311,8 +311,8 @@ msgstr "切换检查超时时间（秒）"
 msgid "Advertising Data"
 msgstr "【广告屏蔽】数据库"
 
-msgid "If use pdnsd,Set pdnsd server_port to 5353"
-msgstr "如果使用pdnsd，请设置pdnsd的server_port为5353"
+msgid "DNS Server IP and Port"
+msgstr "DNS服务器地址和端口"
 
 msgid "Resolve Dns Mode"
 msgstr "DNS解析方式"
