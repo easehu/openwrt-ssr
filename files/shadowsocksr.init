@@ -163,8 +163,13 @@ start_pdnsd() {
 	local tcp_dns_list="208.67.222.222, 208.67.220.220"
 	[ -z "$usr_dns" ] && usr_dns="8.8.8.8"
 	[ -z "$usr_port" ] && usr_port="53"
-
 	mkdir -p /var/etc /var/pdnsd
+	
+  if ! test -f "/var/pdnsd/pdnsd.cache"; then
+	dd if=/dev/zero of="/var/pdnsd/pdnsd.cache" bs=1 count=4 2> /dev/null
+	chown -R nobody.nogroup /var/pdnsd
+	fi
+	
 	cat > /var/etc/pdnsd.conf <<EOF
 global {
 	perm_cache=10240;
@@ -413,6 +418,6 @@ stop() {
 	killall -q -9 ssr-server
 	killall -q -9 ssr-kcptun
 	killall -q -9 ssr-local
-	killall -q -9 pdnsd
+	killall -q pdnsd
 
 }
