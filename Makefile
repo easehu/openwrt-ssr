@@ -9,7 +9,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=openwrt-ssr
-PKG_VERSION:=1.2.0
+PKG_VERSION:=1.2.1
 #PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
@@ -103,7 +103,7 @@ if [ -z "$${IPKG_INSTROOT}" ]; then
 		set firewall.shadowsocksr=include
 		set firewall.shadowsocksr.type=script
 		set firewall.shadowsocksr.path=/var/etc/shadowsocksr.include
-		set firewall.shadowsocksr.reload=1
+		set firewall.shadowsocksr.reload=0
 		commit firewall
 EOF
 fi

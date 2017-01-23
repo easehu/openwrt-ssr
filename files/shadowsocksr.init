@@ -324,7 +324,24 @@ iptables -t filter -A SSR-SERVER-RULE -p tcp --dport $(uci_get_by_name $1 server
 iptables -t filter -A SSR-SERVER-RULE -p udp --dport $(uci_get_by_name $1 server_port) -j ACCEPT
 return 0
 }
+gen_serv_include() {
+FWI=$(uci get firewall.shadowsocksr.path 2>/dev/null) 
+[ -n "$FWI" ] || return 0
+if [ ! -f $FWI ] ;then
+echo '#!/bin/sh' >$FWI
+fi
+extract_rules() {
+echo "*filter"
+iptables-save -t filter | grep SSR-SERVER-RULE|sed -e "s/^-A INPUT/-I INPUT/" 
+echo 'COMMIT'
+}
+	cat <<-EOF >>$FWI
+	iptables-restore -n <<-EOT
+	$(extract_rules)
+	EOT
+EOF
 
+}
 start_server() {
   SERVER_ENABLE=$(uci_get_by_type server_global enable_server)
   [ "$SERVER_ENABLE" = 0 ] && return 0
@@ -332,7 +349,7 @@ start_server() {
 
 	config_load $NAME
 	config_foreach start_service server_config
-	
+	gen_serv_include
 	return 0
 }
 
