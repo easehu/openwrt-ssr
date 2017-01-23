@@ -211,6 +211,10 @@ gen_include() {
 		echo 'COMMIT'
 	}
 	cat <<-EOF >>$FWI
+	icount=\`iptables -t nat -L  | grep $TAG |grep -v grep| wc -l\`
+	if [ "\$icount" -gt 0 ] ;then
+	 return
+	fi
 	iptables-restore -n <<-EOT
 	$(extract_rules nat)
 	$(extract_rules mangle)
