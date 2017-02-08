@@ -92,10 +92,14 @@ ShadowsocksR-libev for OpenWrt
  
    ```bash
    ./scripts/feeds update
+   #如果更新base出现错误，修改SDK目录下的feeds.conf.default文件，将“source.git;HEAD”改为“source.git”
+   
    ./scripts/feeds install zlib
    ./scripts/feeds install libopenssl
    ```
-   
+  - Pandorabox(潘多拉)编译补充
+  潘多拉也是Openwrt的另一个定制版本，用16.10版本的SDK编译时无法使用feed获取安装包，需要先将libpcre、zlib、libopenssl等makefile放入SDK的package目录，再make menuconfig
+  这三个包的makefile可以从[这里下载][8]
    
 安装
 --- 
@@ -244,4 +248,5 @@ GFW版本支持IP路由模式和GFW列表模式，需卸载原有的dnsmasq，�
   [5]: https://github.com/shadowsocks/openwrt-shadowsocks
   [6]: https://github.com/shadowsocks/luci-app-shadowsocks  
   [7]: https://github.com/bettermanbao/openwrt-kcptun/releases 
+  [8]: http://iytc.net/tools/pand.rar 
   [S]: https://wiki.openwrt.org/doc/howto/obtain.firmware.sdk
