@@ -97,7 +97,7 @@ ShadowsocksR-libev for OpenWrt
    ./scripts/feeds install zlib
    ./scripts/feeds install libopenssl
    ```
-  - Pandorabox(潘多拉)编译补充
+ - Pandorabox(潘多拉)编译补充
   潘多拉也是Openwrt的另一个定制版本，用16.10版本的SDK编译时无法使用feed获取安装包，需要先将libpcre、zlib、libopenssl等makefile放入SDK的package目录，再make menuconfig
   这三个包的makefile可以从[这里下载][8]
    
