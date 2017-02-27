@@ -399,7 +399,14 @@ start() {
 	
 	if  [ -z "$gfw_enable" ] ;then
 	case "$(uci_get_by_type global tunnel_enable)" in
-		1|on|true|yes|enabled) start_tunnel;;
+		1|on|true|yes|enabled)
+			start_tunnel
+			mkdir -p /tmp/dnsmasq.d
+			cat > /tmp/dnsmasq.d/dnsmasq-ssr.conf <<EOF
+conf-dir=/etc/dnsmasq.ssr
+EOF
+			/etc/init.d/dnsmasq restart
+			;;
 	esac
 	fi
 	
@@ -436,5 +443,9 @@ stop() {
 	killall -q -9 ssr-kcptun
 	killall -q -9 ssr-local
 	killall -q pdnsd
+	if [ -f "/tmp/dnsmasq.d/dnsmasq-ssr.conf" ]; then
+		rm -f /tmp/dnsmasq.d/dnsmasq-ssr.conf
+		/etc/init.d/dnsmasq restart
+	fi
 
 }

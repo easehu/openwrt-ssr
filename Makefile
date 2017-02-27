@@ -112,21 +112,6 @@ if [ -z "$${IPKG_INSTROOT}" ]; then
 	( . /etc/uci-defaults/luci-shadowsocksr ) && rm -f /etc/uci-defaults/luci-shadowsocksr
 	chmod 755 /etc/init.d/shadowsocksr >/dev/null 2>&1
 	/etc/init.d/shadowsocksr enable >/dev/null 2>&1
-	
-	if [ "$(1)" = "GFW" ] ;then
-	 if [ -f "/etc/dnsmasq.conf" ]; then
-   str=`cat /etc/dnsmasq.conf|grep conf-dir`
-    if [ -z "$str" ]; then
-     echo "conf-dir=/etc/dnsmasq.ssr" >> /etc/dnsmasq.conf
-    else
-     sed -i '/conf-dir/d' /etc/dnsmasq.conf  
-     echo "conf-dir=/etc/dnsmasq.ssr" >> /etc/dnsmasq.conf
-    fi 
-   else
-    echo "conf-dir=/etc/dnsmasq.ssr" > /etc/dnsmasq.conf
-   fi
-	 /etc/init.d/dnsmasq restart 
-	fi
 fi
 exit 0
 endef
