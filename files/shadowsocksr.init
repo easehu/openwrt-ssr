@@ -397,16 +397,16 @@ start() {
 	if rules ;then
 	start_redir
 	
-	if  [ -z "$gfw_enable" ] ;then
-	case "$(uci_get_by_type global tunnel_enable)" in
-		1|on|true|yes|enabled)
+	if  [ "$gfw_enable"x == "gfw"x ] ;then
+#	case "$(uci_get_by_type global tunnel_enable)" in
+#		1|on|true|yes|enabled)
 			start_tunnel
 			mkdir -p /tmp/dnsmasq.d
 			cat > /tmp/dnsmasq.d/dnsmasq-ssr.conf <<EOF
 conf-dir=/etc/dnsmasq.ssr
 EOF
 			/etc/init.d/dnsmasq restart
-			;;
+#			;;
 	esac
 	fi
 	
